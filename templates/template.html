@@ -73,15 +73,15 @@
                     </div>
                 </div>
                 <div class="modal-body">
-                    <form class="form" method="" action="">
+                    <form class="form" method="POST" action="{{ url_for('login') }}">
                         
                         <div class="card-body">
                             <div class="form-group bmd-form-group">
                                 <div class="input-group">
                                     <span class="input-group-addon">
-                                        <i class="material-icons">email</i>
+                                        <i class="material-icons">perm_identity</i>
                                     </span>
-                                    <input type="text" class="form-control" placeholder="Email...">
+                                    <input type="text" class="form-control" name="username" placeholder="Username">
                                 </div>
                             </div>
 
@@ -90,14 +90,14 @@
                                     <span class="input-group-addon">
                                         <i class="material-icons">lock_outline</i>
                                     </span>
-                                    <input type="password" placeholder="Password..." class="form-control">
+                                    <input type="password" placeholder="Password..." name="password" class="form-control">
                                 </div>
                             </div>
                         </div>
+                        <div class="modal-footer justify-content-center">
+                          <input class="btn btn-primary btn-link btn-wd btn-lg" type = "submit" value="login"/>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <a href="#pablo" class="btn btn-primary btn-link btn-wd btn-lg">login</a>
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
         </div>
       <div class="col-lg-4 col-md-6 ml-auto mr-auto">
         <div class="card card-login">
-          <form class="form" method="" action="">
+          <form class="form" action = "{{ url_for('register') }}" method = "POST">
             <div class="card-header card-header-primary text-center">
               <h4 class="card-title">Register Here</h4>
             </div>
@@ -137,27 +137,57 @@
                     <i class="material-icons">face</i>
                   </span>
                 </div>
-                <input type="text" class="form-control" placeholder="Name...">
+                <input type="text" class="form-control" name="name" placeholder="Name...">
               </div>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
-                    <i class="material-icons">mail</i>
+                    <i class="material-icons">perm_identity</i>
                   </span>
                 </div>
-                <input type="email" class="form-control" placeholder="Email...">
+                <input type="text" class="form-control" name="username" placeholder="Username">
               </div>
+
+                  
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
                     <i class="material-icons">lock_outline</i>
                   </span>
                 </div>
-                <input type="password" class="form-control" placeholder="Password...">
+                <input type="password" class="form-control" name="pass" placeholder="Password...">
               </div>
+              <div class="form-check form-check-radio">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="teacher" checked >
+                    Teacher
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                </label>
+            </div>
+            <div class="form-check form-check-radio">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="category" id="exampleRadios2" value="parent" >
+                    Parent
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                </label>
+            </div>
+            
+            <div class="form-check form-check-radio disabled">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="student" >
+                    Student
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                </label>
+            </div>
             </div>
             <div class="footer text-center">
-              <a href="#pablo" class="btn btn-primary btn-link btn-wd btn-lg">Get Started</a>
+              <input class="btn btn-primary btn-link btn-wd btn-lg" type = "submit" value="submit"/>
             </div>
           </form>
         </div>
