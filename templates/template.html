@@ -16,6 +16,15 @@
   <link href="static/css/material-kit.css" rel="stylesheet" />
   <!-- CSS Just for demo purpose, don't include it in your project -->
   <link href="static/css/demo.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <style>
+    .box{
+        display: none;
+    }
+   
+    </style>
+  
 </head>
 
 <body class="index-page sidebar-collapse">
@@ -125,7 +134,8 @@
         </div>
       <div class="col-lg-4 col-md-6 ml-auto mr-auto">
         <div class="card card-login">
-          <form class="form" action = "{{ url_for('register') }}" method = "POST">
+          <form class="form" id="singupForm" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="card-header card-header-primary text-center">
               <h4 class="card-title">Register Here</h4>
             </div>
@@ -137,7 +147,7 @@
                     <i class="material-icons">face</i>
                   </span>
                 </div>
-                <input type="text" class="form-control" name="name" placeholder="Name...">
+                <input type="text" class="form-control validate" id="name" name="name" placeholder="Name..." pattern="[a-zA-Z][a-zA-Z ]+" required>
               </div>
               <div class="input-group">
                 <div class="input-group-prepend">
@@ -145,7 +155,7 @@
                     <i class="material-icons">perm_identity</i>
                   </span>
                 </div>
-                <input type="text" class="form-control" name="username" placeholder="Username">
+                <input type="text" class="form-control validate" id="username"  name="username" placeholder="Username" required>
               </div>
 
                   
@@ -155,11 +165,20 @@
                     <i class="material-icons">lock_outline</i>
                   </span>
                 </div>
-                <input type="password" class="form-control" name="pass" placeholder="Password...">
+                <input type="password" class="form-control validate" id="pass" name="pass" placeholder="Password..." title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
               </div>
+              <div class="form-check form-check-radio ">
+                <label class="form-check-label">
+                    <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="student" checked>
+                    Student
+                    <span class="circle">
+                        <span class="check"></span>
+                    </span>
+                </label>
+            </div>
               <div class="form-check form-check-radio">
                 <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="teacher" checked >
+                    <input class="form-check-input" type="radio" name="category" id="exampleRadios3" value="teacher"  >
                     Teacher
                     <span class="circle">
                         <span class="check"></span>
@@ -176,30 +195,84 @@
                 </label>
             </div>
             
-            <div class="form-check form-check-radio ">
-                <label class="form-check-label">
-                    <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="student" >
-                    Student
-                    <span class="circle">
-                        <span class="check"></span>
-                    </span>
-                </label>
+            
             </div>
-            </div>
-            <!-- <div id="teacher">
+            <div class="teacher box">
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">
-                    <i class="material-icons"></i>
+                    <i class="material-icons">school</i>
                   </span>
                 </div>
-                <input type="text" class="form-control" name="name" placeholder="Name...">
+                <select name="school" id="school" class="selectpicker form-control validate" data-live-search="true" title="Search school...">
+                  {% for i in range(count) %}
+                  <option data-subtext="{{schools[i][1]}}" value="{{schools[i][0]}}" >
+                   {{schools[i][2]}}
+                  </option>
+                  {% endfor %}
+                </select>
               </div>
-            </div> -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">phone</i>
+                  </span>
+                </div>
+                <input type="text" class="form-control validate" id="contact" name="contact" placeholder="Contact number" >
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">email</i>
+                </div>
+                <input type="email" class="form-control validate" id="email" name="email" placeholder="Email Id">
+                <span class="helper-text" data-error="Enter your email address here" data-success=""></span>
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">home</i>
+                </div>
+                <input type="text" class="form-control validate" id="address" name="address" placeholder="Address">
+              </div>
+            </div>
+            <div class="parent box">
+              
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">phone</i>
+                  </span>
+                </div>
+                <input type="text" class="form-control validate" id="contact1" name="contact1" placeholder="Contact number">
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">email</i>
+                </div>
+                <input type="email" class="form-control validate" id="email1" name="email1" placeholder="Email Id">
+              </div>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">
+                    <i class="material-icons">home</i>
+                </div>
+                <input type="text" class="form-control validate" id="address1" name="address1" placeholder="Address">
+              </div>
+            </div>
+            <div class="student box">
+
+            </div>
+            <br>
             <div class="footer text-center">
-              <input class="btn btn-primary btn-link btn-wd btn-lg" type = "submit" value="submit"/>
+              <div class="input-field col s12">
+                <button class="waves-effect waves-light btn btn-primary" id="signupButton" >submit</button>
+            </div>
+            <br>
             </div>
           </form>
+          <div id="form-response"></div>
         </div>
       </div>
   </div>
@@ -221,25 +294,32 @@
       </div>
     </div>
   </footer>
+  
   <script src="static/js/core/jquery.min.js" type="text/javascript"></script>
   <script src="static/js/core/popper.min.js" type="text/javascript"></script>
   <script src="static/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
   <script src="static/js/plugins/moment.min.js"></script>
-  <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
-  <script src="static/js/plugins/bootstrap-datetimepicker.js" type="text/javascript"></script>
+  <script src="static/js/material-kit.js?v=2.0.6" type="text/javascript"></script>
+  
+  <!-- <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script> -->
+  
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script> -->
+
   <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
   <script src="static/js/plugins/nouislider.min.js" type="text/javascript"></script>
-  <!--  Google Maps Plugin    -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-  <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
-  <script src="static/js/material-kit.js?v=2.0.6" type="text/javascript"></script>
+  <script src="static/js/notify.js"></script>
   <script>
-    $(document).ready(function() {
-      //init DateTimePickers
-      materialKit.initFormExtendedDatetimepickers();
 
-      // Sliders Init
-      materialKit.initSliders();
+     
+    $(document).ready(function() {
+      $('input[type="radio"]').click(function(){
+        var inputValue = $(this).attr("value");
+        var targetBox = $("." + inputValue);
+        $(".box").not(targetBox).hide();
+        $(targetBox).show();
+    });
     });
 
 
@@ -250,6 +330,104 @@
         }, 1000);
       }
     }
+    
+    
+    $('#signupButton').click(function(event){
+        var form = $('#singupForm');
+        var form_id = 'singupForm';
+        var url = '/register';
+        var type = 'POST';
+        var formData = getSignupFormData(form_id);
+
+        send_form(form, form_id, url, type, modular_ajax, formData);
+    });
+
+    function getSignupFormData(form) {
+        var formData = new FormData(document.getElementById(form));
+        return formData
+    }
+    function send_form(form, form_id, url, type, inner_ajax, formData) {
+        if ( form[0].checkValidity()) {
+          event.preventDefault();
+
+          var cat = formData.get('category')
+          if(cat == "teacher"){
+            if(formData.get('school') == ''){
+              $("#school").notify("School field is empty");
+            }
+            else if(formData.get('contact') == ''){
+              //alert("Contact field is empty");
+              $("#contact").notify("Email field is empty");
+            }
+            else if(formData.get('email') == ''){
+              
+              //alert("Email field is empty");
+              $("#email").notify("Email field is empty");
+            }
+            else{
+              
+              inner_ajax(url, type, formData);
+            }
+          }
+          else if(cat == "parent"){
+              
+              if(formData.get('contact1') == ''){
+                $("#contact1").notify("Contact field is empty");
+              }
+              else if(formData.get('email1') == ''){
+                $("#email1").notify("Email field is empty");
+              }
+              else{
+                
+                inner_ajax(url, type, formData);
+              }
+          }
+          else{
+            
+            inner_ajax(url, type, formData);
+          }
+
+      }
+    }
+
+    function modular_ajax(url, type, formData) {
+      $.ajax({
+          url: url,
+          type: type,
+          data: formData,
+          dataType: 'json',
+          processData: false,
+          contentType: false,
+          beforeSend: function() {
+              $('#form-response').html("<div class='progress'><div class='indeterminate'></div></div>");
+          },
+          complete: function () {
+            // hide the preloader (progress bar)
+            $('#form-response').html("");
+        },
+          success: function ( data ){
+            if(data.msg == "Some error occured. Please Try again"){
+            $.notify(data.msg, "error");}
+            else{
+              $.notify(data.msg, "success");}
+            
+          },
+          error: function(data) {
+            $.notify("Error in registration", {align:"center", verticalAlign:"top"});
+          },
+      }).done(function(data) {
+      });
+    };
+
+    var csrf_token = "{{ csrf_token() }}";
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
 
   </script>
 </body>
