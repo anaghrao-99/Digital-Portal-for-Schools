@@ -91,7 +91,7 @@ def login():
                     accounts = cursor.fetchall()
                     return render_template("profile.html",user=username, name=name)
                 elif(category == "school"):
-                    
+                    return render_template("school_dashboard.html",user=username, name=name)
             msg = "done"
             return render_template("template.html",msg = msg)
             
@@ -99,10 +99,14 @@ def login():
             mycon.rollback()
             msg = "error in insert operation"
             return render_template("template.html",msg = msg)
-            print("error")
+            
       
         finally:
             mycon.close()
+
+@app.route('/search',methods=['POST','GET'])
+def search():
+    return render_template("school_dashboard.html")
 
 
 

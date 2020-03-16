@@ -1,0 +1,26 @@
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+
+    </body>
+</html> -->
+
+<form class="form-inline ml-auto">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  
+    <div class="form-group no-border">
+      <!-- <input type="text" class="form-control" placeholder="Search"> -->
+      <select name="schoolSearch" id="schoolSearch" data-style="btn-outline-primary" class="no-border selectpicker validate" data-live-search="true" title="Search" required>
+        {% for i in range(count) %}
+        <option data-subtext="{{schools[i][1]}}" value="{{schools[i][0]}}" >
+         {{schools[i][2]}}
+        </option>
+        {% endfor %}
+      </select>
+    
+    </div>
+    <button type="submit" class="btn btn-white btn-just-icon btn-round">
+        <i class="material-icons">search</i>
+    </button>
+</form>
