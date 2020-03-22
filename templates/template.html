@@ -31,35 +31,6 @@
   
 </head>
 
-<script>
-  function includeHTML() {
-    var z, i, elmnt, file, xhttp;
-    /*loop through a collection of all HTML elements:*/
-    z = document.getElementsByTagName("*");
-    for (i = 0; i < z.length; i++) {
-      elmnt = z[i];
-      /*search for elements with a certain atrribute:*/
-      file = elmnt.getAttribute("w3-include-html");
-      if (file) {
-        /*make an HTTP request using the attribute value as the file name:*/
-        xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4) {
-            if (this.status == 200) {elmnt.innerHTML = this.responseText;}
-            if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
-            /*remove the attribute, and call this function once more:*/
-            elmnt.removeAttribute("w3-include-html");
-            includeHTML();
-          }
-        }      
-        xhttp.open("GET", file, true);
-        xhttp.send();
-        /*exit the function:*/
-        return;
-      }
-    }
-  };
-  </script>
 
 <body class="index-page sidebar-collapse">
   <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
@@ -82,11 +53,11 @@
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             
               <div class="form-group no-border">
-                <!-- <input type="text" class="form-control" placeholder="Search"> -->
+                 <!-- <input type="text" class="form-control" placeholder="Search">  -->
                 <select name="schoolSearch" id="schoolSearch" data-style="btn-outline-primary" class="no-border selectpicker validate" data-live-search="true" title="Search" required>
-                  {% for i in range(count) %}
-                  <option data-subtext="{{schools[i][1]}}" value="{{schools[i][0]}}" >
-                   {{schools[i][2]}}
+                  {% for i in range(schools[1]) %}
+                  <option data-subtext="{{schools[0][i][1]}}" value="{{schools[0][i][0]}}" >
+                   {{schools[0][i][2]}}
                   </option>
                   {% endfor %}
                 </select>
@@ -136,7 +107,7 @@
                                     <span class="input-group-addon">
                                         <i class="material-icons">perm_identity</i>
                                     </span>
-                                    <input type="text" class="form-control" name="username" placeholder="Username">
+                                    <input type="text" class="form-control" id="username1" name="username1" placeholder="Username">
                                 </div>
                             </div>
 
@@ -145,7 +116,8 @@
                                     <span class="input-group-addon">
                                         <i class="material-icons">lock_outline</i>
                                     </span>
-                                    <input type="password" placeholder="Password..." name="password" class="form-control">
+                                    <input type="password" placeholder="Password" id="password1" name="password1" class="form-control">
+                                    
                                 </div>
                             </div>
                         </div>
@@ -255,9 +227,9 @@
                   </span> 
                 <div class="col-sm-10">
                 <select name="school" id="school" data-style="btn-outline-primary" class="selectpicker form-control validate" data-live-search="true" title="Search school">
-                  {% for i in range(count) %}
-                  <option data-subtext="{{schools[i][1]}}" value="{{schools[i][0]}}" >
-                   {{schools[i][2]}}
+                  {% for i in range(schools[1]) %}
+                  <option data-subtext="{{schools[0][i][1]}}" value="{{schools[0][i][0]}}" >
+                   {{schools[0][i][2]}}
                   </option>
                   {% endfor %}
                 </select>
@@ -373,6 +345,10 @@
     });
     });
 
+    $(document).ready(function() {
+      var message = '{{msg}}'
+      $.notify(message,"info")
+    });
 
     function scrollToDownload() {
       if ($('.section-download').length != 0) {
@@ -471,6 +447,7 @@
     };
 
     var csrf_token = "{{ csrf_token() }}";
+    console.log(csrf_token)
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

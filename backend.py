@@ -11,6 +11,10 @@ cursor = mycon.cursor()
 
 app.config['SECRET_KEY'] = 'digitalPortalForSchools'
 
+
+
+
+
 @app.route('/register',methods = ['GET','POST'])
 def register():
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -60,69 +64,137 @@ def register():
             data['msg'] = msg
             return json.dumps(data)
             
+@app.route('/profile')
+def profile():
+    print("welcome")
+    username = session['username']
+    try:
+        mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+        cursor = mycon.cursor()
+        sql = ("select * from login where username=%s")
+        val = (username,)
+        cursor.execute(sql, val)
+        accounts = cursor.fetchall()
+        account = accounts[0]
 
-@app.route('/login',methods = ['POST', 'GET'])
-def login():
+        name = account[3]
+        category = account[2]
+        
+
+
+        if(category == "student"):
+            sql = "select * from student where studentUsername=%s"
+            val = (username,)
+            cursor.execute(sql, val)
+            
+            accounts = cursor.fetchall()
+            msg = "Welcome " + name
+            mycon.close()
+            if(len(accounts) == 0):
+                return render_template("studentInfo.html",msg=msg,user=username,name=name)
+            else:
+                return render_template("profile.html",msg=msg,user=username, name=name)
+        elif(category == "school"):
+            msg = "Welcome " + name
+            print("school")
+            mycon.close()
+            return render_template("school_dashboard.html",msg=msg,user=username, name=name)
+        else:
+            schoolsData = schools()
+            mycon.close()
+            return render_template("template.html",msg=msg,schools = schoolsData)
+    except:
+        msg = "Error"
+        schoolsData = schools()
+        return render_template("template.html",msg=msg,schools = schoolsData)
+    finally:
+        mycon.close()
+        
+
+
+def schools():
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
 
     cursor = mycon.cursor()
+    cursor.execute("select school.schoolUsername, school.address, login.name from school join login where school.schoolUsername = login.username")
+    school = cursor.fetchall()
+    count = len(school)
+    schoolsData=[school,count]
+    mycon.close()
+    return schoolsData
+
+
+@app.route('/signOut')
+def signOut():
+    session.pop('username',None)
+    return redirect('/')
+
+@app.route('/login',methods = ['POST', 'GET'])
+def login():
+    msg = "Error in login"
     if request.method == 'POST':
         try:
-            usr = request.form['username']
-            pas = (hashlib.sha512((request.form['password']).encode())).hexdigest()
-            
+            usr = request.form['username1']
+            pas = (hashlib.sha512((request.form['password1']).encode())).hexdigest()
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
             sql = "select * from login where username=%s and password=%s"
             val = (usr,pas)
             cursor.execute(sql, val)
             
             accounts = cursor.fetchall()
-            account = accounts[0]
-
-            if(len(accounts)==1):
-                username = usr
-                name = account[3]
-                category = account[2]
-
-                if(category == "student"):
-                    sql = "select * from student where username=%s"
-                    val = (username)
-                    cursor.execute(sql, val)
-                    
-                    accounts = cursor.fetchall()
-                    return render_template("profile.html",user=username, name=name)
-                elif(category == "school"):
-                    return render_template("school_dashboard.html",user=username, name=name)
-            msg = "done"
-            return render_template("template.html",msg = msg)
-            
-        except:
-            mycon.rollback()
-            msg = "error in insert operation"
-            return render_template("template.html",msg = msg)
-            
-      
-        finally:
             mycon.close()
+            if(len(accounts)==1):
+                session['username'] = usr
+                print("redirecting")
+                return redirect('/profile')
+                
+            else:
+                msg = "Incorrect Username or Password"
+                schoolsData = schools()
+                return render_template("template.html",msg=msg,schools = schoolsData)
+
+                    
+        except:
+            msg = "Some Error Occured. Please try again."
+            session.pop('username',None)
+            schoolsData = schools()
+            return render_template("template.html",msg=msg,schools = schoolsData)
+            
+            
+
+
+
+
+
 
 @app.route('/search',methods=['POST','GET'])
 def search():
     return render_template("school_dashboard.html")
 
 
-
 @app.route('/')
 def index():
-    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    # while(1):
+    #     if 'username' in session:
+    #         session.pop('username',None)  
+    #     else:
+    #         break
+    if 'username' in session:
+        return redirect('/profile')
+    schoolsData = schools()
+    msg = "Welcome"
+    return render_template('template.html',msg=msg, schools=schoolsData)
 
-    cursor = mycon.cursor()
-    cursor.execute("select school.schoolUsername, school.address, login.name from school join login where school.schoolUsername = login.username")
-    schools = cursor.fetchall()
-    count = len(schools)
-    return render_template('template.html', schools=schools, count=count)
 
 
 if __name__ == '__main__':
+    
     app.run(debug = True)
+
+
+
+
     # pas = (hashlib.sha512(("school01").encode())).hexdigest()
     # print(pas)
 
