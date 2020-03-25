@@ -190,9 +190,12 @@ def search():
     val = ( school_name, )
     cursor.execute(sql_comments, val)
     school_comments = cursor.fetchall()
-
+    print(school_comments)
+    count = len(school_comments)
+    comments = [school_comments, count]
+    print(comments)
     if(len(school_info) != 0):
-        return render_template("school_dashboard.html", school_info = school_info, school_comments = school_comments)
+        return render_template("school_dashboard.html", school_info = school_info, school_comments = comments)
 
 
 @app.route('/')
@@ -202,6 +205,7 @@ def index():
     #         session.pop('username',None)  
     #     else:
     #         break
+    # session.pop('username', None)
     if 'username' in session:
         return redirect('/profile')
     schoolsData = schools()

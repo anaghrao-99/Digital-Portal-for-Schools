@@ -119,18 +119,35 @@
                   </div> 
             
           <div class="tab-pane text-center gallery" id="comments">
+            {% for i in range(school_comments[1]) %}
             <div class="row">
+              <div class="col-md-2"></div>
+              <div class="col-md-6 card">
+
+                <b>{{ school_comments[0][i][1]}}</b>&nbsp;
+                {{school_comments[0][i][2]}}
+                <!-- <img src="./static/img/like.png"> -->
+                <link rel="icon" type="image/png" href="./static/img/like.png">
+                <p>{{school_comments[0][i][3]}}</p>
+                <!-- <img src="./static/img/unlike.png"> -->
+                <link rel="icon" type="image/png" href="./static/img/unlike.png">
+                <p>{{school_comments[0][i][4]}}</p>
+              </div>
+            </div>
+            {% endfor %}
+            <!-- <div class="row">
+
               <div class="col-md-6 ml-auto">
-                <!-- <img src="static/img/examples/olu-eletu.jpg" class="rounded">
+                <img src="static/img/examples/olu-eletu.jpg" class="rounded">
                 <img src="static/img/examples/clem-onojeghuo.jpg" class="rounded">
-                <img src="static/img/examples/cynthia-del-rio.jpg" class="rounded"> -->
+                <img src="static/img/examples/cynthia-del-rio.jpg" class="rounded">
                 
               </div>
               <div class="col-md-3 mr-auto">
                 <img src="static/img/examples/mariya-georgieva.jpg" class="rounded">
                 <img src="static/img/examples/clem-onojegaw.jpg" class="rounded">
               </div>
-            </div>
+            </div> -->
           </div>
           <div class="tab-pane text-center gallery" id="newsfeed">
             <div class="row">
