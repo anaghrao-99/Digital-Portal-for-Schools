@@ -166,7 +166,6 @@
           $('#studentInfoSubmit').click(function(event){
             event.preventDefault();
             var formData = new FormData(document.getElementById('studentForm'));
-            console.log(formData.get('school'))
             if(formData.get('school') == ''){
               $("#school").notify("School field is empty");
             }
@@ -178,7 +177,7 @@
                 username: '{{user}}',
                 parentUsername: formData.get('parentUsername'),
                 password : formData.get('password'),
-                school : document.getElementById('school').value,
+                school : formData.get('school'),
                 standard : formData.get('standard')
               }
               console.log(dataStudent)
@@ -202,7 +201,6 @@
               $.notify(data['msg'],"info");
             });
             }
-            console.log("no")
 
           });
 
@@ -224,7 +222,6 @@
 
         $(document).ready(function(){
             $('#school').change(function(event){
-              // event.preventDefault();
               var inputValue = document.getElementById('school');
               console.log(inputValue.value);
               $.ajax({
@@ -278,7 +275,7 @@
 
         $(document).ready(function() {
           var message = '{{msg}}'
-          $.notify(message,"info")
+          $.notify(message)
         });
     
     </script>

@@ -36,7 +36,7 @@
   <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
     <div class="container">
       <div class="navbar-translate">
-        <a class="navbar-brand" href="https://demos.creative-tim.com/material-kit/index.html">
+        <a class="navbar-brand" href="/">
           DigiSchool </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
           <span class="sr-only">Toggle navigation</span>
@@ -49,7 +49,7 @@
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <!-- <div w3-include-html="static/search.html"></div> -->
-            <form class="form-inline ml-auto">
+            <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             
               <div class="form-group no-border">
@@ -130,7 +130,8 @@
         </div>
     </div>
 </div>
-  <div class="page-header header-filter" data-parallax="true" style="background-image: url('static/img/bg3.jpg')">
+<!-- header-filter -->
+  <div class="page-header header-filter" data-parallax="true" style="background-image: url('static/img/locker.jpg')">
     <div class="container">
       <div class="row">
         <div class="col-md-8 ml-auto mr-auto">

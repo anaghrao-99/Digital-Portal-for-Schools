@@ -217,12 +217,43 @@ def student_info():
 
 @app.route('/search',methods=['POST','GET'])
 def search():
-    return render_template("school_dashboard.html")
+    school_name = request.form.get('schoolSearch')
+    # print("Hello")
+    print(school_name)
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    
+    string = "select * from school where schoolUsername=%s"
+    
+    val = ( school_name, )
+    
+    cursor.execute(string, val)
+    school_info = cursor.fetchall()
+    print(school_info)
+
+
+    cursor = mycon.cursor()
+    sql_comments = "select * from schoolComments where schoolUsername=%s"
+    val = ( school_name, )
+    cursor.execute(sql_comments, val)
+    school_comments = cursor.fetchall()
+    print(school_comments)
+    count = len(school_comments)
+    comments = [school_comments, count]
+    print(comments)
+    if(len(school_info) != 0):
+        return render_template("school_dashboard.html", school_info = school_info, school_comments = comments)
 
 
 @app.route('/')
 def index():
     msg = "Welcome"
+    # while(1):
+    #     if 'username' in session:
+    #         session.pop('username',None)  
+    #     else:
+    #         break
+    # session.pop('username', None)
     if 'username' in session:
         return redirect('/profile')
     if 'msg' not in session:
