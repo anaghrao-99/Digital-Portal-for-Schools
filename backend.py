@@ -164,8 +164,13 @@ def profile():
                 return render_template("profile.html",msg=session['msg'],user=username, name=name)
         elif(category == "school"):
             print("school")
+            data = schoolInformation(username)
+            school_info = data[0]
+            comments = data[1]
+            schoolsData = schools()
             mycon.close()
-            return render_template("school_dashboard.html",msg=session['msg'],user=username, name=name)
+            return render_template("dashboard.html",schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments)
+
         else:
             schoolsData = schools()
             mycon.close()
@@ -215,34 +220,41 @@ def student_info():
             data['msg'] = session['msg']
             return json.dumps(data)
 
-@app.route('/search',methods=['POST','GET'])
-def search():
-    school_name = request.form.get('schoolSearch')
-    # print("Hello")
-    print(school_name)
+def schoolInformation(username):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
     
     string = "select * from school where schoolUsername=%s"
     
-    val = ( school_name, )
+    val = ( username, )
     
     cursor.execute(string, val)
     school_info = cursor.fetchall()
-    print(school_info)
-
-
     cursor = mycon.cursor()
     sql_comments = "select * from schoolComments where schoolUsername=%s"
-    val = ( school_name, )
+    val = ( username, )
     cursor.execute(sql_comments, val)
     school_comments = cursor.fetchall()
-    print(school_comments)
     count = len(school_comments)
     comments = [school_comments, count]
-    print(comments)
+
+    data = [school_info, comments]
+    return data
+
+
+
+@app.route('/search',methods=['POST','GET'])
+def search():
+    school_name = request.form.get('schoolSearch')
+    data = schoolInformation(school_name)
+    school_info = data[0]
+    comments = data[1]
+    schoolsData = schools()
+    user = ""
+    if 'username' in session:
+        user = session['username']
     if(len(school_info) != 0):
-        return render_template("school_dashboard.html", school_info = school_info, school_comments = comments)
+        return render_template("dashboard.html",schools=schoolsData,user = user, school_info = school_info, school_comments = comments)
 
 
 @app.route('/')
@@ -256,8 +268,7 @@ def index():
     # session.pop('username', None)
     if 'username' in session:
         return redirect('/profile')
-    if 'msg' not in session:
-        session['msg'] = msg
+    session['msg'] = msg
     schoolsData = schools()
     return render_template('template.html',msg=session['msg'], schools=schoolsData)
 
