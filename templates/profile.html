@@ -1,57 +1,86 @@
 
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <title>DigiSchool</title>
   <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <link rel="apple-touch-icon" sizes="76x76" href="static/img/apple-icon.png">
   <link rel="icon" type="image/png" href="static/img/favicon.png">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <title>
-    DigiSchool
-  </title>
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
-  <!--     Fonts and icons     -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-  <!-- CSS Files -->
-  <link href="static/css/material-kit.css?v=2.0.6" rel="stylesheet" />
-  <!-- CSS Just for demo purpose, don't include it in your project -->
-  <link href="static/demo/demo.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/css/bootstrap-select.min.css" />
+  
+ <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <link href="static/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+
+
+  
 </head>
 
-<body class="profile-page sidebar-collapse">
-  <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
-    <div class="container">
-      <div class="navbar-translate">
-        <a class="navbar-brand" href="https://demos.creative-tim.com/material-kit/index.html">
-          DigiSchool </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="navbar-toggler-icon"></span>
-          <span class="navbar-toggler-icon"></span>
-          <span class="navbar-toggler-icon"></span>
-        </button>
+<body>
+  <div class="wrapper ">
+    <div class="sidebar" data-color="purple" data-background-color="white">
+      <div class="logo">
+        <div class="profile-photo-small" style="text-align: center;">
+            <img src="static/img/faces/avatar.jpg" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+          </div>
+        <div style="text-align: center; padding: 10%;">
+          <h3>{{ studentInfo[0]}}</h3>
+        </div>
       </div>
-      <div class="collapse navbar-collapse">
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
-                <form class="form-inline ml-auto">
-                    <div class="form-group no-border">
-                      <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                    <button type="submit" class="btn btn-white btn-just-icon btn-round">
-                        <i class="material-icons">search</i>
-                    </button>
-                </form>
+      <div class="sidebar-wrapper">
+        <ul class="nav">
+          <li>
+            <div>
+              <span style="float:left;">
+                <i class="material-icons">school</i>
+              </span>
+              <h4>
+                {{studentInfo[2]}}
+              </h4>
+            </div>
           </li>
-          <li class="nav-item">
-            <a href="#pablo" class="nav-link">
-              About
-            </a>
-            <li class="dropdown nav-item">
+          <li>
+            <div>
+              <span style="float:left;">
+                <i class="material-icons">class</i>
+              </span>
+              <h4>
+                {{studentInfo[1]}}
+              </h4>
+            </div>
+            
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="main-panel">
+      <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
+        <div class="container-fluid">
+          <div class="navbar-translate">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="navbar-toggler-icon"></span>
+              <span class="navbar-toggler-icon"></span>
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          </div>
+          <div class="collapse navbar-collapse">
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a href="#pablo" class="nav-link">
+                  About
+                </a>
+              </li>
+              <li class="dropdown nav-item">
                 <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
                   <div class="profile-photo-small">
                     <img src="static/img/faces/avatar.jpg" alt="Circle Image" class="rounded-circle img-fluid">
@@ -62,159 +91,332 @@
                   <a href="/signOut" class="dropdown-item">Sign out</a>
                 </div>
               </li>
-            </ul>
-          </div>
-        </div>
-    </div>
-  </nav>
-  <div class="page-header header-filter" data-parallax="true" style="background-image: url('static/img/city-profile.jpg');"></div>
-  <div class="main main-raised">
-    <div class="profile-content">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12 ml-auto mr-auto">
-            <div class="profile">
-              <div class="avatar">
-                <img src="static/img/faces/christian.jpg" alt="Circle Image" class="img-raised rounded-circle img-fluid">
-              </div>
-              <div class="name">
-                <h3 class="title">{{ name }}</h3>          
-                </div>
+              
+                </ul>
               </div>
             </div>
-          </div>
         </div>
-        <div class="row">
-          <div class="col-md-3">
-            <div class="profile-tabs">
-              <ul class="nav nav-pills nav-pills-icons flex-column" role="tablist">
-                <li class="nav-item">
-                  <a class="nav-link active" href="#note" role="tab" data-toggle="tab">
-                    <i class="material-icons">event</i> Note
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#homework" role="tab" data-toggle="tab">
-                    <i class="material-icons">palette</i> HomeWork
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#result" role="tab" data-toggle="tab">
-                    <i class="material-icons">receipt</i> Results
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <br><br><br>
-          </div>
-        <div class="col-md-8">
-        <div class="tab-content tab-space">
-          <div class="tab-pane active text-center" id="note">
-                <div class="row" style="padding: 60px;">
-                    <div class="col-md-12 ml-auto">
-                      <div class="card">
-                    <div class="card-header" data-background-color="purple">
-                      <h4 class="title">Table Title</h4>
-                      <p class="category">Here is a subtitle for this table</p>
+      </nav>
+      
+      <div class="content">
+        <div class="container-fluid">
+            <div class="container">
+              <div class="card">
+                <div class="card-header card-header-tabs card-header-primary">
+                  <div class="nav-tabs-navigation">
+                    <div class="nav-tabs-wrapper">
+                      <span class="nav-tabs-title">Have a look:</span>
+                      <ul class="nav nav-tabs" data-tabs="tabs">
+                        <li class="nav-item">
+                          <a class="nav-link active" href="#note" data-toggle="tab">
+                            <i class="material-icons">bug_report</i> Notes
+                            <div class="ripple-container"></div>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#home" data-toggle="tab">
+                            <i class="material-icons">code</i> Homework
+                            <div class="ripple-container"></div>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="#result" data-toggle="tab">
+                            <i class="material-icons">cloud</i> Result
+                            <div class="ripple-container"></div>
+                          </a>
+                        </li>
+                      </ul>
                     </div>
-                    <div class="card-content table-responsive table-full-width">
-                    <table class="table" >
-                        <thead>
-                          <col width="40">
-                          <col width="60">
-                          <col width="60">
-                          <col width="200">
-                          <col width="40">
-                            <tr>
-                                <th class="text-center">#</th>
-                                <th class="text-left">Subject</th>
-                                <th class="text-left">Teacher</th>
-                                <th class="text-left">Note</th>
-                                <th class="text-left">Signature</th>
-                            </tr>
-                        </thead>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="tab-content">
+                    <div class="tab-pane active" id="note">
+                      <table class="table">
                         <tbody>
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-left">English</td>
-                                <td class="text-left">Mr. Andrew Mike</td>
-                                <td class="text-left">2013</td>
-                                <td class="td-actions text-left">
-                                    <button type="button" rel="tooltip" class="btn btn-success">
-                                        <i class="material-icons">done</i> Sign
-                                    </button>
+                          <tr>
+                            <th>#</th>
+                            <th>Teacher</th>
+                            <th>Subject</th>
+                            <th>Note</th>
+                            <th>Signature</th>
+                          </tr>
+                          {% for i in range(notes[0]) %}
+                            {% if i==0 %}
+                              <!-- <tr><td></td><td>Notes displayed:</td><td>{{notes[i]-1}}</td></tr> -->
+                            {% else %}
+                              <tr>
+                                <td>
+                                  <b>{{ i }}</b>
                                 </td>
-                            </tr>
+                                <td>{{notes[i][2]}}</td>
+                                <td>{{notes[i][3]}}</td>
+                                <td>{{notes[i][4]}}</td>
+                                <td class="td-actions text-right">
+                                  {% if notes[i][5]=="Unsigned" %}
+                                    <button type="button" rel="tooltip" title="Not signed yet" class="btn btn-danger btn-link btn-sm">
+                                      Unsigned
+                                    </button>
+                                  {% else %}
+                                    <button type="button" rel="tooltip" title="Signed" class="btn btn-success btn-link btn-sm">
+                                      Signed
+                                    </button>
+                                  {% endif %}
+                                </td>
+                              </tr>
+                            {% endif %}
+                          {% endfor %}
                         </tbody>
-                    </table>
+                      </table>
                     </div>
-                    
-                  </div>
+                    <div class="tab-pane" id="home">
+                      
+                    </div>
+                    <div class="tab-pane" id="result">
+                      
+                    </div>
                   </div>
                 </div>
-                  </div> 
-            
-          <div class="tab-pane text-center gallery" id="homework">
-            <div class="row">
-              <div class="col-md-3 ml-auto">
-                <img src="static/img/examples/olu-eletu.jpg" class="rounded">
-                <img src="static/img/examples/clem-onojeghuo.jpg" class="rounded">
-                <img src="static/img/examples/cynthia-del-rio.jpg" class="rounded">
               </div>
-              <div class="col-md-3 mr-auto">
-                <img src="static/img/examples/mariya-georgieva.jpg" class="rounded">
-                <img src="static/img/examples/clem-onojegaw.jpg" class="rounded">
               </div>
-            </div>
           </div>
-          <div class="tab-pane text-center gallery" id="result">
-            <div class="row">
-              <div class="col-md-3 ml-auto">
-                <img src="static/img/examples/mariya-georgieva.jpg" class="rounded">
-                <img src="static/img/examples/studio-3.jpg" class="rounded">
-              </div>
-              <div class="col-md-3 mr-auto">
-                <img src="static/img/examples/clem-onojeghuo.jpg" class="rounded">
-                <img src="static/img/examples/olu-eletu.jpg" class="rounded">
-                <img src="static/img/examples/studio-1.jpg" class="rounded">
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
         </div>
       </div>
+      <footer class="footer">
+        <div class="container-fluid">
+          <nav class="float-left">
+            <ul>
+              <li>
+                <a href="https://www.creative-tim.com">
+                  Creative Tim
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <div class="copyright float-right">
+            &copy;
+            <script>
+              document.write(new Date().getFullYear())
+            </script>, made with <i class="material-icons">favorite</i> by
+            <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a> for a better web.
+          </div>
+          <!-- your footer here -->
+        </div>
+      </footer>
     </div>
   </div>
-  <footer class="footer footer-default">
-    <div class="container">
-      <div class="float-left">
-        
-      </div>
-      <div class="copyright float-right">
-        &copy;
-        <script>
-          document.write(new Date().getFullYear())
-        </script>, made with <i class="material-icons">favorite</i> by
-        <a href="https://www.creative-tim.com/" target="blank">Shuhangi</a> &
-        <a href="https://www.creative-tim.com/" target="blank">Anagh</a>
-        for a better web.
-      </div>
-    </div>
-  </footer>
-  <!--   Core JS Files   -->
+  
   <script src="static/js/core/jquery.min.js" type="text/javascript"></script>
   <script src="static/js/core/popper.min.js" type="text/javascript"></script>
   <script src="static/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
   <script src="static/js/plugins/moment.min.js"></script>
-  <!--	Plugin for the Datepicker, full documentation here: https://github.com/Eonasdan/bootstrap-datetimepicker -->
-  <script src="static/js/plugins/bootstrap-datetimepicker.js" type="text/javascript"></script>
-  <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
-  <script src="static/js/plugins/nouislider.min.js" type="text/javascript"></script>
-  <!--  Google Maps Plugin    -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-  <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
   <script src="static/js/material-kit.js?v=2.0.6" type="text/javascript"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="static/js/plugins/nouislider.min.js" type="text/javascript"></script>
+  <script src="static/js/notify.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+  <script>
+
+    
+
+    $(function() {
+      $('.selectpicker').selectpicker();
+    });
+
+    
+    $('#bologna-list a').on('click', function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+        })
+
+    $(document).ready(function() {
+      var message = '{{msg}}'
+      $.notify(message,"info")
+    });
+
+    var csrf_token = "{{ csrf_token() }}";
+    console.log(csrf_token)
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+  </script>
+    <script>
+      $(document).ready(function() {
+        $().ready(function() {
+          $sidebar = $('.sidebar');
+  
+          $sidebar_img_container = $sidebar.find('.sidebar-background');
+  
+          $full_page = $('.full-page');
+  
+          $sidebar_responsive = $('body > .navbar-collapse');
+  
+          window_width = $(window).width();
+  
+          fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
+  
+          if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
+            if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
+              $('.fixed-plugin .dropdown').addClass('open');
+            }
+  
+          }
+  
+          $('.fixed-plugin a').click(function(event) {
+            // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
+            if ($(this).hasClass('switch-trigger')) {
+              if (event.stopPropagation) {
+                event.stopPropagation();
+              } else if (window.event) {
+                window.event.cancelBubble = true;
+              }
+            }
+          });
+  
+          $('.fixed-plugin .active-color span').click(function() {
+            $full_page_background = $('.full-page-background');
+  
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+  
+            var new_color = $(this).data('color');
+  
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-color', new_color);
+            }
+  
+            if ($full_page.length != 0) {
+              $full_page.attr('filter-color', new_color);
+            }
+  
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.attr('data-color', new_color);
+            }
+          });
+  
+          $('.fixed-plugin .background-color .badge').click(function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+  
+            var new_color = $(this).data('background-color');
+  
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-background-color', new_color);
+            }
+          });
+  
+          $('.fixed-plugin .img-holder').click(function() {
+            $full_page_background = $('.full-page-background');
+  
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parent('li').addClass('active');
+  
+  
+            var new_image = $(this).find("img").attr('src');
+  
+            if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              $sidebar_img_container.fadeOut('fast', function() {
+                $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
+                $sidebar_img_container.fadeIn('fast');
+              });
+            }
+  
+            if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+  
+              $full_page_background.fadeOut('fast', function() {
+                $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
+                $full_page_background.fadeIn('fast');
+              });
+            }
+  
+            if ($('.switch-sidebar-image input:checked').length == 0) {
+              var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+  
+              $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
+              $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
+            }
+  
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
+            }
+          });
+  
+          $('.switch-sidebar-image input').change(function() {
+            $full_page_background = $('.full-page-background');
+  
+            $input = $(this);
+  
+            if ($input.is(':checked')) {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar_img_container.fadeIn('fast');
+                $sidebar.attr('data-image', '#');
+              }
+  
+              if ($full_page_background.length != 0) {
+                $full_page_background.fadeIn('fast');
+                $full_page.attr('data-image', '#');
+              }
+  
+              background_image = true;
+            } else {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar.removeAttr('data-image');
+                $sidebar_img_container.fadeOut('fast');
+              }
+  
+              if ($full_page_background.length != 0) {
+                $full_page.removeAttr('data-image', '#');
+                $full_page_background.fadeOut('fast');
+              }
+  
+              background_image = false;
+            }
+          });
+  
+          $('.switch-sidebar-mini input').change(function() {
+            $body = $('body');
+  
+            $input = $(this);
+  
+            if (md.misc.sidebar_mini_active == true) {
+              $('body').removeClass('sidebar-mini');
+              md.misc.sidebar_mini_active = false;
+  
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
+  
+            } else {
+  
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
+  
+              setTimeout(function() {
+                $('body').addClass('sidebar-mini');
+  
+                md.misc.sidebar_mini_active = true;
+              }, 300);
+            }
+  
+            // we simulate the window Resize so the charts will get updated in realtime.
+            var simulateWindowResize = setInterval(function() {
+              window.dispatchEvent(new Event('resize'));
+            }, 180);
+  
+            // we stop the simulation of Window Resize after the animations are completed
+            setTimeout(function() {
+              clearInterval(simulateWindowResize);
+            }, 1000);
+  
+          });
+        });
+      });
+    </script>
 </body>
 
 </html>
