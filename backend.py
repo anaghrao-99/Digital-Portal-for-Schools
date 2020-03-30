@@ -69,12 +69,23 @@ def schoolInformation(username):
     val = ( username, )
     
     cursor.execute(string, val)
-    school_info = cursor.fetchall()
+    table = cursor.fetchall()
+    school_info = []
+    school = list(table[0])
+    school.append(getName(school[0]))
+    school_info.append(school)
     cursor = mycon.cursor()
     sql_comments = "select * from schoolComments where schoolUsername=%s"
     val = ( username, )
     cursor.execute(sql_comments, val)
-    school_comments = cursor.fetchall()
+    table = list(cursor.fetchall())
+    school_comments =[]
+    for row in table:
+        comment = list(row)
+        comment.append(getCategory(comment[2]))
+        comment[2] = getName(comment[2])
+        school_comments.append(comment)
+        
     count = len(school_comments)
     comments = [school_comments, count]
 
@@ -124,6 +135,75 @@ def getName(username):
     cursor.execute(sql,val)
     table = cursor.fetchall()
     return table[0][3]
+
+def getCategory(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+
+    cursor = mycon.cursor()
+    sql = "select * from login where username=%s"
+    val = (username,)
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    return table[0][2]
+
+
+def isAssociated(school):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+
+    cursor = mycon.cursor()
+
+    sql = "select * from login where username=%s"
+    val=(session['username'],)
+    cursor.execute(sql,val)
+    accounts = cursor.fetchall()
+    account=accounts[0]
+    if account[2] == 'school':
+        return "N"
+    elif account[2] == 'student':
+        sql = "select * from student where studentUsername=%s and verified=%s"
+        val=(session['username'],"verified")
+        cursor.execute(sql,val)
+        accounts = cursor.fetchall()
+        student=accounts[0]
+        if student[2] == school:
+            return "Y"
+        else:
+            return "N"
+    elif account[2] == 'parent':
+        sql = "select * from student where parentUsername=%s and verified=%s"
+        val=(session['username'],"verified")
+        cursor.execute(sql,val)
+        table = cursor.fetchall()
+        if len(table) == 0:
+            return "N"
+        else:
+            for row in table:
+                if row[2] == school:
+                    return "Y"
+            return "N"
+    else:
+        sql = "select * from teacher where teacherUsername=%s and schoolUsername=%s and verified=%s"
+        val=(session['username'],school,"verified")
+        cursor.execute(sql,val)
+        table = cursor.fetchall()
+        if len(table)>0:
+            return "Y"
+        else:
+            return "N"
+
+    
+def insertComment(commenter, comment, school):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    
+    sql = "insert into schoolComments (schoolUsername,comment,commenter) values (%s ,%s ,%s)"
+    val = (school, comment,commenter)
+    cursor.execute(sql,val)
+    mycon.commit()
+    mycon.close()
+    return
+            
+
 
 @app.route('/register',methods = ['GET','POST'])
 def register():
@@ -260,7 +340,7 @@ def profile():
             comments = data[1]
             schoolsData = schools()
             mycon.close()
-            return render_template("dashboard.html",schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
+            return render_template("dashboard.html",editAllowed="N",schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
             schoolsData = schools()
@@ -343,7 +423,21 @@ def signNote():
         finally:
             return data
 
+@app.route('/comment', methods=['POST','GET'])
+def comment():
+    if request.method=='POST':
+        try:
+            usr = session['username']
+            comment = request.form['comment']
+            school = request.form['school']
+            insertComment(usr,comment,school)
+            print("done")
 
+        except Exception as e:
+            print("err ", e)
+        finally:
+            return redirect('/school')
+        
 
 @app.route('/student_info',methods=['POST','GET'])
 def student_info():
@@ -379,25 +473,32 @@ def student_info():
             data['msg'] = session['msg']
             return json.dumps(data)
 
-
-
 @app.route('/search',methods=['POST','GET'])
 def search():
     school_name = request.form.get('schoolSearch')
+    session['search'] = school_name
+    return redirect('/school')
+
+@app.route('/school',methods=['POST','GET'])
+def school():
+    school_name = session['search']
     data = schoolInformation(school_name)
     school_info = data[0]
     comments = data[1]
     schoolsData = schools()
     user = ""
+    name = ""
     category = ""
+    editAllowed = "N"
     if 'username' in session:
         user = session['username']
         cursor.execute(("select category from login where username=%s"),(session['username'],))
         table = cursor.fetchall()
         category = table[0][0]
-        
+        editAllowed = isAssociated(school_name)
+        name = getName(user)
     if(len(school_info) != 0):
-        return render_template("dashboard.html",schools=schoolsData,user = user, school_info = school_info, school_comments = comments,category=category)
+        return render_template("dashboard.html",editAllowed=editAllowed,schools=schoolsData,user = user, name=name, school_info = school_info, school_comments = comments,category=category)
 
 
 @app.route('/')
