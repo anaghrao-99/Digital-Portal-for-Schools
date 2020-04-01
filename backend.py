@@ -128,6 +128,8 @@ def approval(username):
     table = cursor.fetchall()
     for row in table:
         s = list(row)
+        s[1] = classFromCode(s[1])
+        s[3] = getName(s[3])
         s.append(getName(s[0]))
         students.append(s)
     approvals = [teachers,len(teachers),students,len(students)]

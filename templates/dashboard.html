@@ -125,7 +125,8 @@
                     </a>
                       <div class="dropdown-menu dropdown-menu-right">
                         <h6 class="dropdown-header">{{ user }}</h6>
-                        <a href="/signOut" class="dropdown-item">Setup</a>
+                        <button data-toggle="modal" data-target="#StructureModal" class="dropdown-item">Setup</button>
+                        
                         <button data-toggle="modal" data-target="#ApprovalsModal" class="dropdown-item">Approvals</button>
                         <a href="/signOut" class="dropdown-item">Sign out</a>
                      
@@ -181,6 +182,24 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="StructureModal" tabindex="-1" role="">
+      <div class="modal-dialog modal-login" role="document">
+          <div class="modal-content">
+              <div class="card card-signup card-plain">
+                  <div class="modal-header">
+                      <div class="card-header card-header-primary ">
+                          <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="material-icons">clear</i></button>
+                          <h3 class="card-title">Set Teachers</h3>
+                          
+                      </div>
+                  </div>
+                  <div class="modal-body">
+                    
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
     <div class="modal fade" id="ApprovalsModal" tabindex="-1" role="">
       <div class="modal-dialog modal-login" role="document">
           <div class="modal-content">
@@ -269,13 +288,56 @@
                     {% endif %}
                     {% if approvals[3] > 0 %}
                     <div class="student">
-                      <ul>
-                        {% for i in range(approvals[3]) %}
-                        <li>
-
-                        </li>
-                        {% endfor %}
-                      </ul>
+                      
+                        <table>
+                          <thead>TStudents</thead>
+                          <tbody>
+                            {% for i in range(approvals[3]) %}
+                            <tr>
+                              <td>
+                                {{ i+1 }}
+                              </td>
+                              <td>
+                                {{approvals[2][i][8]}}
+                              </td>
+                              <td>
+                                <button class="btn btn-primary btn-link appbox" id="student{{i}}"><i class="material-icons">keyboard_arrow_down</i></button>
+                                
+                              </td>
+                              <td>
+                                <button class="btn btn-success btn-link approvalbox" id="student{{i}}">Approve</button>
+                                
+                              </td>
+                              <td>
+                                <button class="btn btn-danger btn-link approvalbox" id="student{{i}}">Reject</button>
+                                
+                              </td>
+                            </tr>
+                            <tr>
+                                <table class="infobox" id="student{{i}}box" style="width: 70%; text-align: right;">
+                                  <tbody>
+                                    <tr>
+                                      <td>
+                                        Class
+                                      </td>
+                                      <td>
+                                        {{approvals[2][i][1]}}
+                                      </td>
+                                      <tr>
+                                      <td>
+                                        Parent/Guardian:
+                                      </td>
+                                      <td>
+                                        {{approvals[2][i][3]}}
+                                      </td>
+                                    </tr>
+                                    
+                                  </tbody>
+                                </table>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>                      
                     </div>
                     {% else %}
                       <div class="nost">
@@ -480,6 +542,8 @@ $(document).ready(function(){
       $(box).show()
 
     });
+
+
 
     $(document).ready(function(){
       $("#nocom").hide();
