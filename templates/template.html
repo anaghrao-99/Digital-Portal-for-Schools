@@ -437,7 +437,8 @@
             if(data.msg == "Some error occured. Please Try again"){
             $.notify(data.msg, "error");}
             else{
-              $.notify(data.msg, "success");}
+              $.notify(data.msg, "success");
+              location.reload();}
             
           },
           error: function(data) {

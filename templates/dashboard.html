@@ -10,19 +10,12 @@
   <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-  <!-- <link rel="stylesheet" href="static/css/material-kit.css"  /> -->
-  <!-- <link rel="stylesheet" href="static/css/demo.css"/> -->
   <link rel="stylesheet" href="https://jqueryvalidation.org/files/demo/site-demos.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/css/bootstrap-select.min.css" />
-  
- <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <link href="static/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
-  <!-- <link rel="stylesheet" href="static/css/material-kit.css"  /> -->
-  <!-- <link rel="stylesheet" href="static/css/demo.css"/> -->
-  
   <style>
     .box{
         display: none;
@@ -40,11 +33,6 @@
 <body>
   <div class="wrapper ">
     <div class="sidebar" data-color="purple" data-background-color="white">
-      <!--
-      Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
-
-      Tip 2: you can also add an image using data-image tag
-  -->
       <div class="logo">
         <div class="profile-photo-small" style="text-align: center;">
             <img src="static/img/faces/{{school_info[0][0]}}.jpg" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
@@ -198,13 +186,102 @@
           <div class="modal-content">
               <div class="card card-signup card-plain">
                   <div class="modal-header">
-                      <div class="card-header card-header-primary ">
+                      <div class="card-header card-header-primary " style="width: 250px;">
                           <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="material-icons">clear</i></button>
                           <h3 class="card-title">Approvals</h3>
+                          
                       </div>
                   </div>
                   <div class="modal-body">
+                    {% if approvals[1] > 0 %}
+                    <div class="teacher">
                       
+                      <table>
+                        <thead>Teachers</thead>
+                        <tbody>
+                          {% for i in range(approvals[1]) %}
+                          <tr>
+                            <td>
+                              {{ i+1 }}
+                            </td>
+                            <td>
+                              {{approvals[0][i][8]}}
+                            </td>
+                            <td>
+                              <button class="btn btn-primary btn-link appbox" id="teacher{{i}}"><i class="material-icons">keyboard_arrow_down</i></button>
+                              
+                            </td>
+                            <td>
+                              <button class="btn btn-success btn-link approvalbox" id="teacher{{i}}">Approve</button>
+                              
+                            </td>
+                            <td>
+                              <button class="btn btn-danger btn-link approvalbox" id="teacher{{i}}">Reject</button>
+                              
+                            </td>
+                          </tr>
+                          <tr>
+                              <table class="infobox" id="teacher{{i}}box" style="width: 70%; text-align: right;">
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      Biodata:
+                                    </td>
+                                    <td>
+                                      {{approvals[0][i][2]}}
+                                    </td>
+                                    <tr>
+                                    <td>
+                                      Address:
+                                    </td>
+                                    <td>
+                                      {{approvals[0][i][4]}}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      Email:
+                                    </td>
+                                    <td>
+                                      {{approvals[0][i][5]}}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      contact:
+                                    </td>
+                                    <td>
+                                      {{approvals[0][i][3]}}
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                       
+                    </div>
+                    {% else %}
+                      <div class="note">
+                        No teachers approvals pending
+                      </div>
+                    {% endif %}
+                    {% if approvals[3] > 0 %}
+                    <div class="student">
+                      <ul>
+                        {% for i in range(approvals[3]) %}
+                        <li>
+
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                    {% else %}
+                      <div class="nost">
+                        No students approvals pending
+                      </div>
+                    {% endif %}
                   </div>
               </div>
           </div>
@@ -295,10 +372,38 @@
                           </td>
                           <td>
                             <span class="title"> 
-                              <b>{{school_comments[0][i][2]}}</b> ({{school_comments[0][i][3]}})
+                              <b>{{school_comments[0][i][3]}}</b> ({{school_comments[0][i][6]}})
                               <br>
-                              <p>{{ school_comments[0][i][1]}}</p>
+                              <p>{{ school_comments[0][i][2]}}</p>
+                              
                           </span>
+                          </td>
+                          <td>
+                            <div class="row">
+                              {% if school_comments[0][i][7] ==2 %}
+                                <div class="col-sm-4">
+                                  <button id="{{school_comments[0][i][0]}}" type="button" rel="tooltip" title="Upvote" class="btn btn-success btn-link" disabled>
+                                    {{ school_comments[0][i][4]}} <i class="material-icons">keyboard_arrow_up</i>
+                                  </button>
+                                </div>
+                                <div class="col-sm-4">
+                                  <button id="{{school_comments[0][i][0]}}" type="button" rel="tooltip" title="downvote" class="btn btn-info btn-link" disabled>
+                                    {{ school_comments[0][i][5]}} <i class="material-icons">keyboard_arrow_down</i> 
+                                  </button>
+                                </div>
+                              {% else %}
+                                <div class="col-sm-4">
+                                  <button id="{{school_comments[0][i][0]}}" type="button" rel="tooltip" title="Upvote" class="btn btn-success btn-link upvoteButton">
+                                    {{ school_comments[0][i][4]}} <i class="material-icons">keyboard_arrow_up</i>
+                                  </button>
+                                </div>
+                                <div class="col-sm-4">
+                                  <button id="{{school_comments[0][i][0]}}" type="button" rel="tooltip" title="downvote" class="btn btn-info btn-link downvoteButton">
+                                    {{ school_comments[0][i][5]}} <i class="material-icons">keyboard_arrow_down</i> 
+                                  </button>
+                                </div>
+                              {% endif %}
+                            </div>
                           </td>
                             </tr>
                             {% endfor %}
@@ -364,6 +469,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <script>
 
+$(document).ready(function(){
+      $(".infobox").hide()
+    });
+
+    $(".appbox").click(function(){
+      $(".infobox").hide()
+      i = this.id
+      box = "#"+i+"box"
+      $(box).show()
+
+    });
+
     $(document).ready(function(){
       $("#nocom").hide();
       if('{{school_comments[1]}}' == 0){
@@ -375,10 +492,8 @@
       
     });
 
-    $(function() {
-      $('.selectpicker').selectpicker();
-    });
-
+    
+    
     $(document).ready(function(){
       if('{{ editAllowed }}' == "N"){
         $("#comment").hide();
@@ -404,9 +519,75 @@
     });
 
     $(document).ready(function() {
+      console.log(approvals)
       var message = '{{msg}}'
       $.notify(message,"info")
     });
+
+    $(function() {
+      $('.selectpicker').selectpicker();
+    });
+
+
+
+    $(".upvoteButton").click(function(){
+      console.log("hi")
+      data = {
+        id : this.id,
+        vote: 1
+      }
+      console.log(data)
+      $.ajax({
+          url: '/vote',
+          type: 'POST',
+          data: JSON.stringify(data),
+          dataType: "json",
+          contentType: 'application/json;charset=UTF-8',
+          processData: false,
+          success: function ( data ){
+            if(data.msg == "Issue"){
+            $.notify(data.msg, "Internal issue");}
+            else{
+              location.reload(true);
+              $.notify(data.msg, "success");
+              }
+            
+          },
+          error: function(data) {
+            $.notify("Error", {align:"center", verticalAlign:"top"});
+          },
+      }).done(function(data) {
+      });
+    });
+    $(".downvoteButton").click(function(){
+      data = {
+        id : this.id,
+        vote: -1
+      }
+      $.ajax({
+          url: '/vote',
+          type: 'POST',
+          data: JSON.stringify(data),
+          dataType: "json",
+          contentType: 'application/json;charset=UTF-8',
+          processData: false,
+          
+          success: function ( data ){
+            if(data.msg == "Issue"){
+            $.notify(data.msg, "Internal issue");}
+            else{
+              location.reload(true);
+              $.notify(data.msg, "success");
+              }
+            
+          },
+          error: function(data) {
+            $.notify("Error", {align:"center", verticalAlign:"top"});
+          },
+      }).done(function(data) {
+      });
+    });
+
 
     var csrf_token = "{{ csrf_token() }}";
     console.log(csrf_token)

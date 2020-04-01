@@ -63,7 +63,7 @@ def schools():
 def schoolInformation(username):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
-    
+
     string = "select * from school where schoolUsername=%s"
     
     val = ( username, )
@@ -82,16 +82,114 @@ def schoolInformation(username):
     school_comments =[]
     for row in table:
         comment = list(row)
-        comment.append(getCategory(comment[2]))
-        comment[2] = getName(comment[2])
-        school_comments.append(comment)
+        comment.append(getCategory(comment[3]))
+        comment[3] = getName(comment[3])
+        
+
+        if 'username' in session:
+            if session['username'] == username:
+                # print("hi")
+                comment.append(2)                   #cannot like or dislike
+            else:
+                sql_comments = "select * from likes where id=%s and user=%s"
+                val = ( comment[0],session['username'])
+                cursor.execute(sql_comments, val)
+                table=cursor.fetchall()
+                if(len(table) == 0):
+                    comment.append(0)
+                else:
+                    comment.append(table[0][2])
+        else:
+            comment.append(2)
+        school_comments.append(comment)       
         
     count = len(school_comments)
     comments = [school_comments, count]
-
     data = [school_info, comments]
     return data
 
+def approval(username):
+    approvals=[]
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    teachers = []
+    sql = "select * from teacher where verifiedby=%s and verified=%s"
+    val=(username,"pending")
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    for row in table:
+        t = list(row)
+        t.append(getName(t[0]))
+        teachers.append(t)
+    students =[]
+    sql = "select * from student where verifiedby=%s and verified=%s"
+    val=(username,"pending")
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    for row in table:
+        s = list(row)
+        s.append(getName(s[0]))
+        students.append(s)
+    approvals = [teachers,len(teachers),students,len(students)]
+    mycon.close()
+    return approvals
+
+def structure(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+
+    sql = "select * from teaches where classcode in ( select classcode from classStructure where schoolUsername=%s)"
+    val=(username,)
+    cursor.execute(sql,val)
+    structure = cursor.fetchall()
+    struct = [structure,len(structure)]
+
+    mycon.close()
+    return struct
+
+def votes(id,user,vote):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql_comments = "select * from likes where id=%s and user=%s"
+    val = ( id,user)
+    cursor.execute(sql_comments, val)
+    table=cursor.fetchall()
+    if(len(table) == 0):
+        sql_comments = "insert into likes(id,user,vote) values(%s,%s,%s)"
+        val = ( id,user,vote )
+        cursor.execute(sql_comments, val)
+        if vote == 1:
+            sql_comments = "update schoolComments set upvote=upvote+%s where id=%s"
+            val = ( 1,id )
+            cursor.execute(sql_comments, val)
+        else:
+            sql_comments = "update schoolComments set downvote=downvote+%s where id=%s"
+            val = (1, id )
+            cursor.execute(sql_comments, val)
+    else:
+        vote1 = table[0][2]
+        if vote1 != vote:
+            sql_comments = "update likes set vote=%s where id=%s and user=%s"
+            val = ( int(vote),id,user )
+            cursor.execute(sql_comments, val)
+            sql_comments = "update schoolComments set upvote=upvote+%s, downvote=downvote-%s where id=%s"
+            val = ( int(vote),int(vote),id )
+            cursor.execute(sql_comments, val)
+        else:
+            sql_comments = "delete from likes where id=%s and user=%s"
+            val = ( id,user )
+            cursor.execute(sql_comments, val)
+            if vote == 1:
+                sql_comments = "update schoolComments set upvote=upvote-%s where id=%s"
+                val = ( 1,id )
+                cursor.execute(sql_comments, val)
+            else:
+                sql_comments = "update schoolComments set downvote=downvote-%s where id=%s"
+                val = (1, id )
+                cursor.execute(sql_comments, val)
+
+    mycon.commit()
+    return
 
 def classFromCode(class1):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -122,7 +220,7 @@ def studentList(username):
         accounts = cursor.fetchall()
         namec = accounts[0][3]
         usernameList.append([user[0],namec])
-        print(usernameList)
+        # print(usernameList)
     count = len(usernameList)
     return [usernameList,count]
 
@@ -144,6 +242,7 @@ def getCategory(username):
     val = (username,)
     cursor.execute(sql,val)
     table = cursor.fetchall()
+    # print(table)
     return table[0][2]
 
 
@@ -196,8 +295,8 @@ def insertComment(commenter, comment, school):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
     
-    sql = "insert into schoolComments (schoolUsername,comment,commenter) values (%s ,%s ,%s)"
-    val = (school, comment,commenter)
+    sql = "insert into schoolComments (schoolUsername,comment,commenter,upvote,downvote) values (%s ,%s ,%s, %s, %s)"
+    val = (school, comment,commenter ,int(0) ,int(0))
     cursor.execute(sql,val)
     mycon.commit()
     mycon.close()
@@ -295,8 +394,9 @@ def login():
 
 @app.route('/profile',methods=['POST','GET'])
 def profile():
-    username = session['username']
-    try:
+       
+    # try:
+        username = session['username']
         mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
         cursor = mycon.cursor()
         sql = ("select * from login where username=%s")
@@ -339,8 +439,11 @@ def profile():
             school_info = data[0]
             comments = data[1]
             schoolsData = schools()
+            approvals = approval(username)
+            struct = structure(username)
+            print(approvals[1])
             mycon.close()
-            return render_template("dashboard.html",editAllowed="N",schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
+            return render_template("dashboard.html",editAllowed="N",approvals=approvals,structure=struct,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
             schoolsData = schools()
@@ -349,12 +452,12 @@ def profile():
     
     
     
-    except Exception as e:
-        session['msg'] = "Error"
-        print(e)
-        schoolsData = schools()
-        return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
-    finally:
+    # except Exception as e:
+    #     session['msg'] = "Error"
+    #     print(e)
+    #     schoolsData = schools()
+    #     return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
+    # finally:
         mycon.close()
 
 
@@ -380,11 +483,28 @@ def classStructure():
             return json.dumps(classData)
 
 
+@app.route('/vote', methods=['POST','GET'])
+def vote():
+    if request.method == 'POST':
+        data = {}
+        try:
+            i = request.json['id']
+            vote = request.json['vote']
+            username = session['username']
+            votes(i,username,vote)
+            msg="done"
+        except Exception as e:
+            msg = "Issue"
+            print(e)
+        finally:
+            data['msg'] = msg
+            return data
+
 
 @app.route('/child',methods=['POST','GET'])
 def child():
     if(request.method=='POST'):
-        # try:
+        try:
             susername = request.form['susername']
             username = request.form['username']
             name = request.form['name']
@@ -404,9 +524,9 @@ def child():
             else:
                 notes = data[2]
                 return render_template("childProfile.html",child=child,notes=notes,studentInfo=studentinfo,msg=session['msg'],user=username, name=name,schools=schoolsData,category="parent",children=usernameList,count=count)
-        # except Exception as e:
-        #     print(e)
-        #     return redirect('/profile')
+        except Exception as e:
+            print(e)
+            return redirect('/profile')
 
 @app.route('/signNote', methods=['POST','GET'])
 def signNote():
@@ -488,17 +608,15 @@ def school():
     schoolsData = schools()
     user = ""
     name = ""
-    category = ""
     editAllowed = "N"
     if 'username' in session:
         user = session['username']
         cursor.execute(("select category from login where username=%s"),(session['username'],))
         table = cursor.fetchall()
-        category = table[0][0]
         editAllowed = isAssociated(school_name)
         name = getName(user)
     if(len(school_info) != 0):
-        return render_template("dashboard.html",editAllowed=editAllowed,schools=schoolsData,user = user, name=name, school_info = school_info, school_comments = comments,category=category)
+        return render_template("dashboard.html",editAllowed=editAllowed,schools=schoolsData,user = user, name=name, school_info = school_info, school_comments = comments,category="viewer")
 
 
 @app.route('/')
