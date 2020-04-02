@@ -140,12 +140,36 @@ def structure(username):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
 
-    sql = "select * from teaches where classcode in ( select classcode from classStructure where schoolUsername=%s)"
+    sql = "select classcode from classStructure where schoolUsername=%s"
     val=(username,)
     cursor.execute(sql,val)
-    structure = cursor.fetchall()
-    struct = [structure,len(structure)]
+    table = list(cursor.fetchall())
+    
+    structure=[]
+    for row in table:
+        sql = "select * from teaches where classcode=%s"
+        val=(row[0],)
+        cursor.execute(sql,val)
+        s1 = list(cursor.fetchall())
+        s3=[]
+        for i in range(len(s1)):
+            s2 = list(s1[i])
+            if s2[2] != None:
+                s2[2] = getName(s2[2])
+            s3.append(s2)
 
+        s=[classFromCode(row[0]),row[0],s3,len(s3)]
+        
+        structure.append(s)
+    sql = "select * from teacher where schoolUsername=%s and verified=%s"
+    val=(username,'verified')
+    cursor.execute(sql,val)
+    table = list(cursor.fetchall())
+    teacher = []
+    for row in table:
+        teacher.append([row[0], getName(row[0])])
+    struct = [structure,len(structure),teacher,len(teacher)]
+    print(teacher)
     mycon.close()
     return struct
 
@@ -302,6 +326,52 @@ def insertComment(commenter, comment, school):
     cursor.execute(sql,val)
     mycon.commit()
     mycon.close()
+    return
+
+
+def rejected(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    
+    sql = "select * from login where username=%s"
+    val = (username,)
+    cursor.execute(sql,val)
+
+    table = cursor.fetchall()
+    category = table[0][2]
+
+    if(category == 'student'):
+        sql = "delete from student where studentUsername=%s"
+        val = (username,)
+        cursor.execute(sql,val)
+    else:
+        sql = "delete from teacher where teacherUsername=%s"
+        val = (username,)
+        cursor.execute(sql,val)
+    
+        sql = "delete from login where username=%s"
+        val = (username,)
+        cursor.execute(sql,val)
+    mycon.commit()
+    return
+
+def approved(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql = "select * from login where username=%s"
+    val = (username,)
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    category = table[0][2]
+    if(category == 'student'):
+        sql = "update student set verified=%s where studentUsername=%s"
+        val = ('verified',username)
+        cursor.execute(sql,val)
+    else:
+        sql = "update teacher set verified=%s where teacherUsername=%s"
+        val = ('verified',username)
+        cursor.execute(sql,val)
+    mycon.commit()    
     return
             
 
@@ -462,7 +532,11 @@ def profile():
     # finally:
         mycon.close()
 
-
+@app.route('/setUp',methods=['POST','GET'])
+def setUp():
+    data = schoolInformation(session['username'])
+    school = data[0]
+    return render_template('setup.html',school_info=school)
 
 @app.route('/classStructure',methods=['POST','GET']) 
 def classStructure():
@@ -560,6 +634,33 @@ def comment():
         finally:
             return redirect('/school')
         
+
+@app.route('/approve',methods=['POST','GET'])
+def approve():
+    data={}
+    if request.method == 'POST':
+        try:
+            username= request.get_data()
+            print(username)
+            approved(username)
+            data['msg'] = "done"
+        except:
+            data['msg'] = "Issue"
+        finally:
+            return data
+
+@app.route('/reject',methods=['POST','GET'])
+def reject():
+    data={}
+    if request.method == 'POST':
+        try:
+            username= request.get_data()
+            rejected(username)
+            data['msg'] = "done"
+        except:
+            data['msg'] = "Issue"
+        finally:
+            return data
 
 @app.route('/student_info',methods=['POST','GET'])
 def student_info():
