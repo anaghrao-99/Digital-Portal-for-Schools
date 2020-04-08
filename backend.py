@@ -136,7 +136,7 @@ def approval(username):
     mycon.close()
     return approvals
 
-def structure(username):
+def classes(username):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
 
@@ -144,34 +144,57 @@ def structure(username):
     val=(username,)
     cursor.execute(sql,val)
     table = list(cursor.fetchall())
-    
-    structure=[]
+    struct = []
     for row in table:
-        sql = "select * from teaches where classcode=%s"
-        val=(row[0],)
-        cursor.execute(sql,val)
-        s1 = list(cursor.fetchall())
-        s3=[]
-        for i in range(len(s1)):
-            s2 = list(s1[i])
-            if s2[2] != None:
-                s2[2] = getName(s2[2])
-            s3.append(s2)
+        clas = classFromCode(row[0])
+        struct.append([row[0],clas])
+    structure = [struct,len(struct)]
+    mycon.close()
+    return structure
 
-        s=[classFromCode(row[0]),row[0],s3,len(s3)]
-        
-        structure.append(s)
-    sql = "select * from teacher where schoolUsername=%s and verified=%s"
-    val=(username,'verified')
+def structure(classcode):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+
+    sql = "select subject, teacherUsername from teaches where classcode=%s"
+    val=(classcode,)
     cursor.execute(sql,val)
     table = list(cursor.fetchall())
+    table1 = []
+    for row in table:
+        if row[1] != None:
+            table1.append([row[0],getName(row[1])])
+        else:
+            table1.append([row[0],row[1]])
+
+    return table1
+
+def setTeacher(classcode,teacher):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    for teach in teacher:
+        if teach[0] !="" and teach[1]!="":
+
+            sql = "update teaches set teacherUsername=%s where classcode=%s and subject=%s"
+            val = ( teach[1],classcode,teach[0] )
+            cursor.execute(sql,val)
+    mycon.commit()
+    mycon.close()
+    return
+
+
+def getTeachers(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql = "select teacherUsername from teacher where schoolUsername=%s and verified=%s"
+    val = ( username,"verified" )
+    cursor.execute(sql,val)
+    table=cursor.fetchall()
     teacher = []
     for row in table:
-        teacher.append([row[0], getName(row[0])])
-    struct = [structure,len(structure),teacher,len(teacher)]
-    print(teacher)
-    mycon.close()
-    return struct
+        teacher.append([row[0],getName(row[0])])
+    return teacher
+
 
 def votes(id,user,vote):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -467,7 +490,7 @@ def login():
 @app.route('/profile',methods=['POST','GET'])
 def profile():
        
-    # try:
+    try:
         username = session['username']
         mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
         cursor = mycon.cursor()
@@ -512,10 +535,8 @@ def profile():
             comments = data[1]
             schoolsData = schools()
             approvals = approval(username)
-            struct = structure(username)
-            print(approvals[1])
             mycon.close()
-            return render_template("dashboard.html",editAllowed="N",approvals=approvals,structure=struct,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
+            return render_template("dashboard.html",editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
             schoolsData = schools()
@@ -524,19 +545,54 @@ def profile():
     
     
     
-    # except Exception as e:
-    #     session['msg'] = "Error"
-    #     print(e)
-    #     schoolsData = schools()
-    #     return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
-    # finally:
+    except Exception as e:
+        session['msg'] = "Error"
+        print(e)
+        schoolsData = schools()
+        return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
+    finally:
         mycon.close()
 
 @app.route('/setUp',methods=['POST','GET'])
 def setUp():
     data = schoolInformation(session['username'])
     school = data[0]
-    return render_template('setup.html',school_info=school)
+    struct = classes(session['username'])
+    return render_template('setup.html',school_info=school,structure=struct)
+
+@app.route('/getStructure',methods=['POST','GET'])
+def getStructure():
+    if request.method == 'POST':
+        data = {}
+        struct = []
+        try:
+            classcode = request.get_data()
+            struct = structure(classcode)
+            teachers = getTeachers(session['username'])
+            msg='done'
+            data['struct'] = struct
+            data['teachers'] = teachers
+        except Exception as e:
+            print(e)
+            msg ='error'
+        finally:
+            data['msg'] = msg
+            return data
+
+@app.route('/setStructure',methods=['POST','GET'])
+def setStructure():
+    if request.method == 'POST':
+        data = {}
+        try:
+            classcode = request.json['classcode']
+            teach = request.json['teachers']
+            setTeacher(classcode,teach)
+            msg='done'
+        except:
+            msg = 'error'
+        finally:
+            data['msg'] = msg
+            return data
 
 @app.route('/classStructure',methods=['POST','GET']) 
 def classStructure():
@@ -714,13 +770,17 @@ def school():
     editAllowed = "N"
     if 'username' in session:
         user = session['username']
-        cursor.execute(("select category from login where username=%s"),(session['username'],))
-        table = cursor.fetchall()
         editAllowed = isAssociated(school_name)
         name = getName(user)
     if(len(school_info) != 0):
-        return render_template("dashboard.html",editAllowed=editAllowed,schools=schoolsData,user = user, name=name, school_info = school_info, school_comments = comments,category="viewer")
-
+        data = schoolInformation(school_name)
+        school_info = data[0]
+        comments = data[1]
+        schoolsData = schools()
+        approvals = approval(school_name)
+        mycon.close()
+        return render_template("dashboard.html",editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
+       
 
 @app.route('/')
 def index():
