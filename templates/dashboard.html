@@ -579,7 +579,7 @@ $(document).ready(function(){
     });
 
     $(document).ready(function() {
-      console.log(approvals)
+      console.log('{{approvals}}')
       var message = '{{msg}}'
       $.notify(message,"info")
     });
@@ -587,10 +587,6 @@ $(document).ready(function(){
     $(function() {
       $('.selectpicker').selectpicker();
     });
-
-    $('.nav-tabs').scrollingTabs();
-
-
 
     $(".upvoteButton").click(function(){
       console.log("hi")
