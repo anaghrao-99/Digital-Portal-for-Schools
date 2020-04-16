@@ -412,6 +412,38 @@ def get_classes_from_teacher(username):
     return classes
 
 
+def getSchool(teacher):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select * from teacher where teacherUsername=%s"
+    val = (teacher, )
+    cursor.execute(query, val)
+    school = cursor.fetchall()
+    print(school[0][1])
+    return school[0][1]
+
+
+def nameFromUsername(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select * from login where username=%s"
+    val = (username, )
+    cursor.execute(query, val)
+    name = cursor.fetchall()
+    return name[0][3]
+
+
+def getSubject(teacher, classcode):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select subject from teaches where classcode=%s and teacherUsername=%s"
+    val = (classcode, teacher)
+    cursor.execute(query, val)
+    entry = cursor.fetchall()
+    print(entry)
+    return entry
+
+
 @app.route('/register',methods = ['GET','POST'])
 def register():
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -528,7 +560,6 @@ def login():
 
 @app.route('/profile',methods=['POST','GET'])
 def profile():
-       
     try:
         username = session['username']
         mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -600,9 +631,6 @@ def profile():
             # print(classCodes)
             return render_template("teacher.html",name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
 
-
-    
-    
     except Exception as e:
         session['msg'] = "Error"
         print(e)
@@ -618,32 +646,6 @@ def setUp():
     struct = classes(session['username'])
     return render_template('setup.html',school_info=school,structure=struct)
 
-def getSchool(teacher):
-    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
-    cursor = mycon.cursor()
-    query = "select * from teacher where teacherUsername=%s"
-    val = (teacher, )
-    cursor.execute(query, val)
-    school = cursor.fetchall()
-    print(school[0][1])
-    return school[0][1]
-def nameFromUsername(username):
-    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
-    cursor = mycon.cursor()
-    query = "select * from login where username=%s"
-    val = (username, )
-    cursor.execute(query, val)
-    name = cursor.fetchall()
-    return name[0][3]
-def getSubject(teacher, classcode):
-    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
-    cursor = mycon.cursor()
-    query = "select subject from teaches where classcode=%s and teacherUsername=%s"
-    val = (classcode, teacher)
-    cursor.execute(query, val)
-    entry = cursor.fetchall()
-    print(entry)
-    return entry
 @app.route('/getStudents',methods=['POST','GET'])
 def getStudents():
     if request.method == 'POST':
@@ -687,16 +689,16 @@ def getStudents():
             data['msg'] = msg
             return data
 
-
-@app.route('/upload', methods= ['POST'])
+@app.route('/upload',methods=['POST','GET'])
 def upload():
     if request.method == 'POST':  
         f = request.files['file']  
         f.save(f.filename)
-        names = request.args.get('names')
-        classcode = request.args.get('classCode')
-        subject = request.args.get('subject')
-        # print(classcode)
+        print(f.filename)
+        names = request.form['name']
+        classcode = request.form['classCode']
+        subject = request.form['subject']
+        print(names,classcode,subject)
         print("Name is : " + str(names))
         print('Classcode ' + str(classcode))
         print('subject : ' + str(subject))
@@ -704,8 +706,29 @@ def upload():
         src = f.filename
         dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
         shutil.move(src, dest)
-        return "Success"
-        # return redirect(url_for('profile'))
+    data = {}
+    data['msg'] = "done"
+    print(data)
+    return data
+
+# @app.route('/upload', methods= ['POST'])
+# def upload():
+#     if request.method == 'POST':  
+#         f = request.files['file']  
+#         f.save(f.filename)
+#         names = request.args.get('names')
+#         classcode = request.args.get('classCode')
+#         subject = request.args.get('subject')
+#         # print(classcode)
+#         print("Name is : " + str(names))
+#         print('Classcode ' + str(classcode))
+#         print('subject : ' + str(subject))
+#         print(f.filename)
+#         src = f.filename
+#         dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+#         shutil.move(src, dest)
+#         return "Success"
+#         # return redirect(url_for('profile'))
 
 
 
@@ -867,6 +890,8 @@ def reject():
             data['msg'] = "Issue"
         finally:
             return data
+
+
 
 @app.route('/student_info',methods=['POST','GET'])
 def student_info():

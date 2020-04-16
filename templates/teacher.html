@@ -250,6 +250,9 @@
                         <th>
                           Upload
                         </th>
+                        <th>
+                          Status
+                        </th>
                       </thead>
                       <tbody id="students">
                         
@@ -294,24 +297,11 @@
   <script src="static/js/notify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <!-- <script src="static/js/jquery.scrolling-tabs.js"></script> -->
+
   <script>
-
-    $(function() {
-      $('.selectpicker').selectpicker();
-    });
-
-    
-    $(document).ready(function() {
-          $("#submit_document").click(function(){
-
-          });
-        });
-
-
     $("#classCode").change(function(){
       event.preventDefault();
       classval = document.getElementById('classCode');
-      // console.log("Hello from ajax")
       console.log(classval.value)
       $.ajax({
         url: 'getStudents',
@@ -327,24 +317,17 @@
             var name = data['name']
             var subject= data['subject']
             console.log(subject)
-            // var classcode = data['classcode']
             $("#student tr").remove();
             var i=0;
-            // console.log(students.length)
             for(i=0;i<students.length;i++){
               content = '<tr><th><b>'+ name[i]+'</b></th>'
               content = content + '<td> ' + class_section[i] + '</td>'
-              // content = content + '<td>' 
-              //<button id = "upload" class="btn btn-round btn-primary" data-toggle="modal">UPLOAD</button>
-              // string = name[i]
-              content += '<td><form action = "/upload?names='+ students[i][0] + '&classCode=' + students[i][1] + '&subject=' + subject[i] + '"'
-              // content += '<td><form'
-              content += ' method = "post" enctype="multipart/form-data"> <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="file" id = "file" name="file" /><input type = "submit" class="btn btn-round btn-primary" id="submit_document" value="Upload"></form></td>'
+              content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
+              content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value='+ subject[i] +'><input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button></form></td><td><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td>'
               console.log(content)
               $("#students").append(content)
               $("#after").show();
             }
-            // console.log(content)
             $.notify("Done", "success")
           }
           else{
@@ -357,9 +340,47 @@
       }).done(function(data) {
       });
     });
+     
 
-    
-
+     function uploadData(i){
+       event.preventDefault();
+       console.log("hi")
+        formName = "#" + i +"uploadForm" 
+        var form = $(formName)[0];
+        var formData = new FormData(form)
+        console.log(formData.get('file')['name'])
+        if(formData.get('file')['name'] == ""){
+          $(formName).notify("Please select a file","danger")
+        }
+        else{
+          $.ajax({
+            url : '/upload',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+              var id = "#" + i + "Button"
+              $(id).append('<i class="material-icons">done</i>');
+              
+            },
+            error: function(data) {
+              console.log("error")
+              var id = "#" + i + "Button"
+              $(id).append('<i class="material-icons">clear</i>');
+            },
+        }).done(function(data) {
+          console.log("done")
+        });
+     }
+     };
+  </script>
+  <script>
+    $(function() {
+      $('.selectpicker').selectpicker();
+    });
 
     $(document).ready(function() {
           $("#after").hide();

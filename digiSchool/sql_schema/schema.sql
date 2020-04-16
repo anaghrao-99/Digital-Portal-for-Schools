@@ -2,6 +2,8 @@
 create database digischool;
 use digischool;
 
+select * from teacher;
+
 create table login(
 username varchar(45) Not null,
 password varchar(45) not null,
@@ -55,7 +57,9 @@ teacherUsername varchar(45),
 primary key(classcode,subject),
 foreign key(teacherUsername) references teacher(teacherUsername),
 foreign key(classcode) references class(classcode));
-
+SET SQL_SAFE_UPDATES = 0;
+update teaches set subject="social_science" where subject="social science";
+select * from teaches;
 
 create table parent(
 parentUsername varchar(45) not null,
