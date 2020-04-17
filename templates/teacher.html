@@ -110,6 +110,7 @@
           <div class="collapse navbar-collapse">
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
+<<<<<<< HEAD
               <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div id="schoolSearchBar" style="width: 250px;" class="form-group no-border dropdown">
@@ -136,6 +137,8 @@
                     <i class="material-icons">search</i>
                 </button>
             </form>
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
               <li class="nav-item">
                 <a href="#pablo" class="nav-link">
                   About
@@ -238,6 +241,7 @@
               <div class="card">
                 <div class="card-header card-header-primary">
                   <h5 class="card-title  " >Class</h5>
+<<<<<<< HEAD
                   <h6 class="card-subtitle ">Select a class from the list </h6>
                 </div>
 
@@ -295,6 +299,26 @@
                      
                 </div>
                 
+=======
+                  <h6 class="card-subtitle ">Select a class from the list {{ name }}</h6>
+                </div>
+                <div class="card-body col-md-3">
+                  <form class="form" method="POST">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      
+                      <select name="classCode" id="classCode" data-style="btn btn-outline-secondary" class="selectpicker form-control validate" data-live-search="true" title="Select class Code">
+                      {% for i in classCodes %}
+                        <option value="{{i}}" >
+                        {{i}}
+                        </option>
+                        {% endfor %}
+
+                      </select>
+                      
+                      
+                  </form>
+                </div>
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                 <div class="row" id="after">
                   <div class="card-body">
                     <table class="table">
@@ -305,6 +329,7 @@
                         <th>
                           Class & Sec
                         </th>
+<<<<<<< HEAD
                         <th id="upload">
                           Upload
                         </th>
@@ -314,16 +339,27 @@
                         <th id="notes">
                           Notes
                         </th>
+=======
+                        <th>
+                          Upload
+                        </th>
+                        <th>
+                          Status
+                        </th>
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                       </thead>
                       <tbody id="students">
                         
                       </tbody>
                     </table>
+<<<<<<< HEAD
                     <div style="align-content: right">
                       <button id="correct_button" class="btn btn-round btn-primary btn-right" onclick="correct()" style="align-content: right" >Correct</button>
 
                     </div>
                     
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                   </div> 
                 </div>
                 
@@ -365,9 +401,12 @@
   <!-- <script src="static/js/jquery.scrolling-tabs.js"></script> -->
 
   <script>
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
     $("#classCode").change(function(){
       event.preventDefault();
       classval = document.getElementById('classCode');
@@ -393,6 +432,7 @@
               content = content + '<td> ' + class_section[i] + '</td>'
               content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
               content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value='+ subject[i] +'><input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button></form></td><td><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td>'
+<<<<<<< HEAD
               content += '<td><button id="Notes" class="btn btn-round btn-primary submit_note" onclick="notes()"> Submit Note </button> </td>'
               // console.log(content)
               $("#students").append(content)
@@ -405,6 +445,12 @@
             $("#answerkey").append(content)
             console.log(content)
             $("#answerkey").show()
+=======
+              console.log(content)
+              $("#students").append(content)
+              $("#after").show();
+            }
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
             $.notify("Done", "success")
           }
           else{
@@ -418,6 +464,7 @@
       });
     });
      
+<<<<<<< HEAD
      $(document).ready(function(){
         $("input[type='radio']").click(function(){
             var radioValue = $("input[name='category']:checked").val();
@@ -437,6 +484,8 @@
             }
         });
     });
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
 
      function uploadData(i){
        event.preventDefault();
@@ -458,9 +507,13 @@
             contentType: false,
             success:function(data){
               console.log("success")
+<<<<<<< HEAD
 
               var id = "#" + i + "Button"
 
+=======
+              var id = "#" + i + "Button"
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
               $(id).append('<i class="material-icons">done</i>');
               
             },
@@ -474,6 +527,7 @@
         });
      }
      };
+<<<<<<< HEAD
 
      function uploadAnswerkey(){
         event.preventDefault();
@@ -531,6 +585,8 @@
       });
     };
 
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
   </script>
   <script>
     $(function() {

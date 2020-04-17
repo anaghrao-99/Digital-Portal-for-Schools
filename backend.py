@@ -6,6 +6,7 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.utils import secure_filename
 import os 
 import shutil
+<<<<<<< HEAD
 import sys
 import subprocess 
 from subprocess import run
@@ -27,6 +28,8 @@ module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correcti
 #module_url = "./module5"
 embed = hub.KerasLayer(module_url)
 print("module loaded")
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
 
 
 app = Flask(__name__) 
@@ -710,6 +713,7 @@ def getStudents():
             data['msg'] = msg
             return data
 
+<<<<<<< HEAD
 @app.route('/uploadAnswerKey',methods=['POST','GET'])
 def uploadAnswerKey():
     if request.method == 'POST':  
@@ -728,6 +732,8 @@ def uploadAnswerKey():
         dest = 'automated_correction_module/'+ str(names)+'_' + str(classcode) + '_' + str(subject) + '.txt'
         shutil.move(src, dest)
 
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
 @app.route('/upload',methods=['POST','GET'])
 def upload():
     if request.method == 'POST':  
@@ -743,13 +749,18 @@ def upload():
         print('subject : ' + str(subject))
         print(f.filename)
         src = f.filename
+<<<<<<< HEAD
         dest = 'automated_correction_module/input/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+=======
+        dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
         shutil.move(src, dest)
     data = {}
     data['msg'] = "done"
     print(data)
     return data
 
+<<<<<<< HEAD
 @app.route('/correct', methods=['POST', 'GET'])
 def correct():
     if(request.method == 'POST'):
@@ -782,6 +793,28 @@ def correct():
 
         return data
     
+=======
+# @app.route('/upload', methods= ['POST'])
+# def upload():
+#     if request.method == 'POST':  
+#         f = request.files['file']  
+#         f.save(f.filename)
+#         names = request.args.get('names')
+#         classcode = request.args.get('classCode')
+#         subject = request.args.get('subject')
+#         # print(classcode)
+#         print("Name is : " + str(names))
+#         print('Classcode ' + str(classcode))
+#         print('subject : ' + str(subject))
+#         print(f.filename)
+#         src = f.filename
+#         dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+#         shutil.move(src, dest)
+#         return "Success"
+#         # return redirect(url_for('profile'))
+
+
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
 
 @app.route('/getStructure',methods=['POST','GET'])
 def getStructure():

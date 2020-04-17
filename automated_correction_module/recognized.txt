@@ -1,1 +1,5 @@
+<<<<<<< HEAD
  Osmosis is a grocess by which the molecules of the solvent pass from the solution of low concentration to a solution of high concenitration through a semipermeable smerubrane . mebrane .
+=======
+ Osmosis is aa procets . by which the nokernes s of the 8olvent pass grore enm She solution oy high corcatrdn n Through aa Benmperneatb ter mebrane .
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
