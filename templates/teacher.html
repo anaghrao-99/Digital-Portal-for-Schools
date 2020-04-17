@@ -111,6 +111,7 @@
           <div class="collapse navbar-collapse">
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
+<<<<<<< HEAD
                   <li class="nav-item">
                     <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
                       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -139,6 +140,37 @@
                       </button>
                   </form>
                   </li>
+=======
+<<<<<<< HEAD
+              <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div id="schoolSearchBar" style="width: 250px;" class="form-group no-border dropdown">
+                  <input type="text" onkeyup="myFunction()" id="mySearch" style="width: 100%;color:white;" data-toggle="dropdown" class="form-control validate dropdown-toggle" placeholder="Search" required>
+                  <input type="text" name="schoolSearch" id="schoolSearch" class="form-control" hidden>
+                  
+                  <ul id="myUL"class="list-group dropdown-menu" style="width: 250px;">
+                    {% for i in range(schools[1]) %}
+                    <li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-primary searching" id='{{schools[0][i][0]}}' style="text-align: left;">
+                     <div class="d-flex w-100 justify-content-between">
+                        <p class="mb-1">{{schools[0][i][2]}}</p>
+                      </div>
+                      <small>{{schools[0][i][1]}}</small>
+                    </li>
+                    {% endfor %}
+                    <li class="list-group-item list-group-item-action flex-column align-items-start" disabled style="text-align: center;">
+                      <div class="d-flex w-100 justify-content-between">
+                        <small class="mb-1">End of Results</small>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <button type="submit" id="searchSubmit" class="btn btn-white btn-just-icon btn-round">
+                    <i class="material-icons">search</i>
+                </button>
+            </form>
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
+>>>>>>> 1157628561fee2cfcecf3d02de19e849c39cddc6
               <li class="nav-item">
                 <a href="#pablo" class="nav-link">
                   About
@@ -241,6 +273,65 @@
               <div class="card">
                 <div class="card-header card-header-primary">
                   <h5 class="card-title  " >Class</h5>
+<<<<<<< HEAD
+                  <h6 class="card-subtitle ">Select a class from the list </h6>
+                </div>
+
+                <div class="row">
+                  <!-- <div class="col-sm-1"></div> -->
+                  <div class="card-body col-md-3">
+                    <form class="form" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <select name="classCode" id="classCode" data-style="btn btn-outline-secondary" class="selectpicker form-control validate" data-live-search="true" title="Select class Code">
+                        {% for i in classCodes %}
+                          <option value="{{i}}" >
+                          {{i}}
+                          </option>
+                          {% endfor %}
+
+                        </select>
+                        
+                        
+                    </form>
+                  </div>
+                  <!-- <div class="col-md-2"></div> -->
+                  <div style="margin-top: 1.5%" id = "answerkey">
+                    
+                  </div>
+                </div>
+                <div class="row">
+                    <div class=col-sm-1></div>
+                    <div class="col">
+                        
+                        <div class="form-check form-check-radio ">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="category" id="exampleRadios1" value="correction" checked>
+                                Automated Correction
+                                <span class="circle">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class= "col">
+                        <div class="form-check form-check-radio">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="radio" name="category" id="exampleRadios3" value="notes"  >
+                                Notes
+                                <span class="circle">
+                                    <span class="check"></span>
+                                </span>
+                            </label>
+                        </div>
+
+                      </div>
+                    
+                     
+                </div>
+                
+=======
                   <h6 class="card-subtitle ">Select a class from the list {{ name }}</h6>
                 </div>
                 <div class="card-body col-md-3">
@@ -259,6 +350,7 @@
                       
                   </form>
                 </div>
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                 <div class="row" id="after">
                   <div class="card-body">
                     <table class="table">
@@ -269,17 +361,37 @@
                         <th>
                           Class & Sec
                         </th>
+<<<<<<< HEAD
+                        <th id="upload">
+                          Upload
+                        </th>
+                        <th id="upload">
+                          Status
+                        </th>
+                        <th id="notes">
+                          Notes
+                        </th>
+=======
                         <th>
                           Upload
                         </th>
                         <th>
                           Status
                         </th>
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                       </thead>
                       <tbody id="students">
                         
                       </tbody>
                     </table>
+<<<<<<< HEAD
+                    <div style="align-content: right">
+                      <button id="correct_button" class="btn btn-round btn-primary btn-right" onclick="correct()" style="align-content: right" >Correct</button>
+
+                    </div>
+                    
+=======
+>>>>>>> b7bc749cef26109c730a13a92e6d5cc2f1e4a574
                   </div> 
                 </div>
                 
@@ -377,11 +489,24 @@
               content = content + '<td> ' + class_section[i] + '</td>'
               content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
               content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value='+ subject[i] +'><input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button></form></td><td><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td>'
+
+              content += '<td><button id="Notes" class="btn btn-round btn-primary submit_note" onclick="notes()"> Submit Note </button> </td>'
+              // console.log(content)
+              $("#students").append(content)
+              $("#after").show();
+              
+              $('td:nth-child(5),th:nth-child(5)').hide();
+            }
+            content = ''
+            content += '<form id = "answerkey_upload" class="form" method = "post" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="teacher" value="{{ name }}"><input type="hidden" name="subject" value=' +  subject[0] + '><input type="hidden" name="classcode" value = ' + students[0][1] + '><input type="file" name="file" required /><button class="btn btn-link btn-round btn-primary" id = "answerkey_upload" onclick="uploadAnswerkey(this.id)" >Submit answer Key</button>'
+            $("#answerkey").append(content)
+            console.log(content)
+            $("#answerkey").show()
               console.log(content)
               $("#students").append(content)
               $("#after").show();
-            }
-            $.notify("Done", "success")
+           
+            $.notify("Done", "success");
           }
           else{
             $.notify("Some error occured please try again","danger");
@@ -394,7 +519,25 @@
       });
     });
      
+     $(document).ready(function(){
+        $("input[type='radio']").click(function(){
+            var radioValue = $("input[name='category']:checked").val();
+            if(radioValue == "notes"){
 
+                // console.log(radioValue)
+                $('td:nth-child(5),th:nth-child(5)').show();
+                $('td:nth-child(3),th:nth-child(3)').hide();
+                $('td:nth-child(4),th:nth-child(4)').hide();
+                $('#correct_button').hide()
+            }
+            else{
+              $('td:nth-child(5),th:nth-child(5)').hide();
+              $('td:nth-child(3),th:nth-child(3)').show();
+              $('td:nth-child(4),th:nth-child(4)').show();
+              $('#correct_button').show()
+            }
+        });
+    });
      function uploadData(i){
        event.preventDefault();
        console.log("hi")
@@ -415,6 +558,7 @@
             contentType: false,
             success:function(data){
               console.log("success")
+
               var id = "#" + i + "Button"
               $(id).append('<i class="material-icons">done</i>');
               
@@ -429,6 +573,62 @@
         });
      }
      };
+     function uploadAnswerkey(){
+        event.preventDefault();
+        console.log("hi upload")
+        formName = "#answerkey_upload"
+        var form = $(formName)[0];
+        console.log(form)
+        var formData = new FormData(form)
+        console.log(formData.get('file')['name'])
+        if(formData.get('file')['name'] == ""){
+          $(formName).notify("Please select a file","danger")
+        }
+        else{
+          $.ajax({
+            url : '/uploadAnswerkey',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+
+             // /
+              
+            },
+            error: function(data) {
+              console.log("error")
+              // var id = "#" + i + "Button"
+              // $(id).append('<i class="material-icons">clear</i>');
+            },
+        }).done(function(data) {
+          console.log("done")
+        });
+     }
+
+     };
+
+     function correct(){
+      event.preventDefault();
+      console.log("Into Correct function")
+      $.ajax({
+            url : '/correct',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: null,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+
+              
+              
+            },
+      });
+    };
+
   </script>
   <script>
     $(function() {

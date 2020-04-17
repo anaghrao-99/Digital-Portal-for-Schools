@@ -6,6 +6,26 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.utils import secure_filename
 import os 
 import shutil
+import subprocess 
+from subprocess import run
+import time
+from absl import logging
+
+
+import tensorflow as tf
+import tensorflow_hub as hub
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+import re
+import seaborn as sns
+from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
+
+module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
+#module_url = "./module5"
+embed = hub.KerasLayer(module_url)
+print("module loaded")
 
 
 app = Flask(__name__) 
@@ -689,6 +709,24 @@ def getStudents():
             data['msg'] = msg
             return data
 
+@app.route('/uploadAnswerKey',methods=['POST','GET'])
+def uploadAnswerKey():
+    if request.method == 'POST':  
+        f = request.files['file']  
+        f.save(f.filename)
+        print(f.filename)
+        # names = request.form['teacher']
+        classcode = request.form['classCode']
+        subject = request.form['subject']
+        print(names,classcode,subject)
+        # print("Teacher Name is : " + str(names))
+        print('Classcode ' + str(classcode))
+        print('subject : ' + str(subject))
+        print(f.filename)
+        src = f.filename
+        dest = 'automated_correction_module/'+ str(names)+'_' + str(classcode) + '_' + str(subject) + '.txt'
+        shutil.move(src, dest)
+
 @app.route('/upload',methods=['POST','GET'])
 def upload():
     if request.method == 'POST':  
@@ -704,33 +742,45 @@ def upload():
         print('subject : ' + str(subject))
         print(f.filename)
         src = f.filename
-        dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+        dest = 'automated_correction_module/input/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
         shutil.move(src, dest)
     data = {}
     data['msg'] = "done"
     print(data)
     return data
 
-# @app.route('/upload', methods= ['POST'])
-# def upload():
-#     if request.method == 'POST':  
-#         f = request.files['file']  
-#         f.save(f.filename)
-#         names = request.args.get('names')
-#         classcode = request.args.get('classCode')
-#         subject = request.args.get('subject')
-#         # print(classcode)
-#         print("Name is : " + str(names))
-#         print('Classcode ' + str(classcode))
-#         print('subject : ' + str(subject))
-#         print(f.filename)
-#         src = f.filename
-#         dest = 'automated_correction_module/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
-#         shutil.move(src, dest)
-#         return "Success"
-#         # return redirect(url_for('profile'))
+@app.route('/correct', methods=['POST', 'GET'])
+def correct():
+    if(request.method == 'POST'):
+        data = {}
+        print("In /correct")
+        path = 'automated_correction_module/input/'
+        files = os.listdir(path)
+        print(files)
+        for file in files:
+            # img_path = 'input/' + file
+            pipe = subprocess.check_call(["python", "automated_correction_module/word_seg_try.py", path + file])
+            initial_directory = os.path.abspath(os.getcwd())
+            # pipe1 = subprocess.check_call(["python", "word_seg_try.py" , path + file], cwd= initial_directory + '/automated_correction_module/')
+            time.sleep(10)
+            
+            pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+            
+            print("/Correct prediction over")
+            f = open("automated_correction_module/recognized.txt", "r")
+            sent1 = f.read()
+            print(sent1)
+            
+            f2 = open("automated_correction_module/answer_key.txt", "r")
+            sent2 = f2.read()
+            print(sent2)
 
+  
+            messages = [sent1,sent2]
+            print(find_sim(messages))
 
+        return data
+    
 
 @app.route('/getStructure',methods=['POST','GET'])
 def getStructure():
