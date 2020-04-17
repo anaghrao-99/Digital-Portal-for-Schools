@@ -138,7 +138,7 @@
                 <li class="dropdown nav-item schools">
                     <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
                       <div class="profile-photo-small">
-                        <img src="static/img/faces/avatar.jpg" alt="Circle Image" class="rounded-circle img-fluid">
+                        <img src="static/img/faces/{{school_info[0][0]}}.jpg" alt="Circle Image" class="rounded-circle img-fluid">
                       </div>
                     </a>
                       <div class="dropdown-menu dropdown-menu-right">
@@ -358,11 +358,19 @@
           </button>
         </div>
         <div class="modal-body">
-          ... 
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <form method="POST">
+            <label>Activity Detail:</label>
+            <textarea  style="width: 100%;"  rows="5"></textarea>
+            <label>Upload Image:</label>
+            <br/>
+            <input type="file" name="file" required />
+            
+          
+        <!-- </div> -->
+        <!-- <div class="modal-footer"> -->
+          <br/><br/>
+          <button type="button" class="btn btn-round btn-primary">Save changes</button>
+        </form>
         </div>
       </div>
     </div>
@@ -430,7 +438,7 @@
                     <div class="col-sm-8">
                       <h3>Activities</h3>
                     </div>
-                    <div class="col-sm-4 float-right">
+                    <div class="col-sm-4 float-right schools">
                       <button class="btn btn-link btn-dark" type="button" data-toggle="modal" data-target="#activityUpload"> <i class="material-icons">edit</i></button>
                      </div>
                   </div>

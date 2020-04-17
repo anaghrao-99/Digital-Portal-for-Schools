@@ -97,7 +97,8 @@
                         <input name="username" id ="username" value="{{user}}" hidden>
                         <input name="name" id="name" value="{{name}}" hidden>
                         <input name="susername" id="susername" value="{{children[i][0]}}" hidden>
-                        <input style="margin-left:5% ;" class="btn btn-info" type="submit" value={{children[i][1]}}>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input style="margin-left:5% ;margin-right:5%;width:90%;" class="btn btn-info" type="submit" value={{children[i][1]}}>
                     </form>
                     {% endfor %}
                   <a href="/signOut" class="dropdown-item">Sign out</a>
