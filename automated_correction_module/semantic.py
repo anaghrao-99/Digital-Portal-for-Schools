@@ -8,8 +8,8 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
-module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
-#module_url = "./module5"
+# module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
+module_url = "D:/sem8/module5"
 embed = hub.KerasLayer(module_url)
 print("module loaded")
 

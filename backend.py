@@ -20,11 +20,11 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
-from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
+# from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
 
-module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
-#module_url = "./module5"
-embed = hub.KerasLayer(module_url)
+#module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
+# module_url = "D:/sem8/module5"
+# embed = hub.KerasLayer(module_url)
 print("module loaded")
 
 
@@ -709,23 +709,7 @@ def getStudents():
             data['msg'] = msg
             return data
 
-@app.route('/uploadAnswerKey',methods=['POST','GET'])
-def uploadAnswerKey():
-    if request.method == 'POST':  
-        f = request.files['file']  
-        f.save(f.filename)
-        print(f.filename)
-        # names = request.form['teacher']
-        classcode = request.form['classCode']
-        subject = request.form['subject']
-        print(names,classcode,subject)
-        # print("Teacher Name is : " + str(names))
-        print('Classcode ' + str(classcode))
-        print('subject : ' + str(subject))
-        print(f.filename)
-        src = f.filename
-        dest = 'automated_correction_module/'+ str(names)+'_' + str(classcode) + '_' + str(subject) + '.txt'
-        shutil.move(src, dest)
+
 
 @app.route('/upload',methods=['POST','GET'])
 def upload():
@@ -1016,7 +1000,25 @@ def index():
     schoolsData = schools()
     return render_template('template.html',msg=session['msg'], schools=schoolsData,category="")
 
-
+@app.route('/uploadAnswerKey',methods=['POST','GET'])
+def uploadAnswerKey():
+    if request.method == 'POST':  
+        print("hi")
+        f = request.files['file']  
+        f.save(f.filename)
+        print(f.filename)
+        classcode = request.form['classCode']
+        subject = request.form['subject']
+        print('Classcode ' + str(classcode))
+        print('subject : ' + str(subject))
+        print(f.filename)
+        src = f.filename
+        dest = 'automated_correction_module/'+ str(classcode) + '_' + str(subject) + '.txt'
+        shutil.move(src, dest)
+    data = {}
+    data['msg'] = "done"
+    print(data)
+    return data
 
 if __name__ == '__main__':
     app.run(debug = True)
