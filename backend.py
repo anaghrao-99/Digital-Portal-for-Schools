@@ -20,12 +20,48 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
-from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
+# from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
 
-module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
+# module_url = "/Users/anagh/Desktop/module5"
+  
 # module_url = "D:/sem8/module5"
+
+module_url = "/users/anagh/Desktop/module5"
 embed = hub.KerasLayer(module_url)
 print("module loaded")
+
+
+logging.set_verbosity(logging.ERROR)
+
+def plot_similarity(labels, features, rotation):
+  corr = np.inner(features, features)
+  sns.set(font_scale=1.2)
+  g = sns.heatmap(
+      corr,
+      xticklabels=labels,
+      yticklabels=labels,
+      vmin=0,
+      vmax=1,
+      cmap="YlOrRd")
+  # g.set_xticklabels(labels, rotation=rotation)
+  # g.set_title("Semantic Textual Similarity")
+  return corr[0][1]
+
+
+def run_and_plot(session_, input_tensor_, messages_, encoding_tensor):
+  message_embeddings_ = session_.run(
+      encoding_tensor, feed_dict={input_tensor_: messages_})
+  # return plot_similarity(messages_, message_embeddings_, 90)
+
+def find_sim(messages):
+    similarity_input_placeholder = tf.placeholder(tf.string, shape=(None))
+    similarity_message_encodings = embed(similarity_input_placeholder)
+    with tf.Session() as session:
+        session.run(tf.global_variables_initializer())
+        session.run(tf.tables_initializer())
+        return run_and_plot(session, similarity_input_placeholder, messages,
+                    similarity_message_encodings)
+
 
 
 app = Flask(__name__) 
@@ -743,25 +779,31 @@ def correct():
         print(files)
         for file in files:
             # img_path = 'input/' + file
-            pipe = subprocess.check_call(["python", "automated_correction_module/word_seg_try.py", path + file])
-            initial_directory = os.path.abspath(os.getcwd())
-            # pipe1 = subprocess.check_call(["python", "word_seg_try.py" , path + file], cwd= initial_directory + '/automated_correction_module/')
-            time.sleep(10)
-            
-            pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
-            
-            print("/Correct prediction over")
-            f = open("automated_correction_module/recognized.txt", "r")
-            sent1 = f.read()
-            print(sent1)
-            
-            f2 = open("automated_correction_module/answer_key.txt", "r")
-            sent2 = f2.read()
-            print(sent2)
+            if('.png' in file or '.jpg' in file):
 
-  
-            messages = [sent1,sent2]
-            print(find_sim(messages))
+                initial_directory = os.path.abspath(os.getcwd())
+                # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
+                
+                pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
+                time.sleep(5)
+                
+                pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+                time.sleep(5)
+                print("/Correct prediction over")
+                f = open("automated_correction_module/recognized.txt", "r")
+                sent1 = f.read()
+                print("Recognized" + str(sent1))
+
+                
+                f2 = open("automated_correction_module/answer_key.txt", "r")
+                sent2 = f2.read()
+                print("Answer Key is : " + str(sent2))
+
+      
+                messages = [sent1,sent2]
+                print(messages)
+                # print("finding similarity\n")
+                # print(find_sim(messages))
 
         return data
     
@@ -1003,15 +1045,16 @@ def index():
 @app.route('/uploadAnswerKey',methods=['POST','GET'])
 def uploadAnswerKey():
     if request.method == 'POST':  
-        print("hi")
+        print("hi in upload answer key")
         f = request.files['file']  
         f.save(f.filename)
         print(f.filename)
+        
         classcode = request.form['classCode']
         subject = request.form['subject']
         print('Classcode ' + str(classcode))
         print('subject : ' + str(subject))
-        print(f.filename)
+        # print(f.filename)
         src = f.filename
         dest = 'automated_correction_module/'+ str(classcode) + '_' + str(subject) + '.txt'
         shutil.move(src, dest)

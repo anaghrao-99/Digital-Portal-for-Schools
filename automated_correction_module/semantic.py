@@ -9,7 +9,8 @@ import pandas as pd
 import re
 import seaborn as sns
 # module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
-module_url = "D:/sem8/module5"
+# module_url = "D:/sem8/module5"
+module_url = "/users/anagh/Desktop/module5"
 embed = hub.KerasLayer(module_url)
 print("module loaded")
 
@@ -26,8 +27,8 @@ def plot_similarity(labels, features, rotation):
       vmin=0,
       vmax=1,
       cmap="YlOrRd")
-  g.set_xticklabels(labels, rotation=rotation)
-  g.set_title("Semantic Textual Similarity")
+  # g.set_xticklabels(labels, rotation=rotation)
+  # g.set_title("Semantic Textual Similarity")
   return corr[0][1]
 
 
