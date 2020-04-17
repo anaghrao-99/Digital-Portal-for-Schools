@@ -3,6 +3,32 @@ import mysql.connector
 import hashlib 
 import json
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.utils import secure_filename
+import os 
+import shutil
+import sys
+import subprocess 
+from subprocess import run
+import time
+from absl import logging
+
+
+import tensorflow as tf
+import tensorflow_hub as hub
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import pandas as pd
+import re
+import seaborn as sns
+from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
+
+module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
+#module_url = "./module5"
+embed = hub.KerasLayer(module_url)
+print("module loaded")
+
+
 app = Flask(__name__) 
 csrf = CSRFProtect(app)
 mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -397,6 +423,46 @@ def approved(username):
     mycon.commit()    
     return
             
+def get_classes_from_teacher(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql = "select * from teaches where teacherUsername=%s"
+    val = (username,)
+    cursor.execute(sql, val)
+    classes = cursor.fetchall()
+    return classes
+
+
+def getSchool(teacher):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select * from teacher where teacherUsername=%s"
+    val = (teacher, )
+    cursor.execute(query, val)
+    school = cursor.fetchall()
+    print(school[0][1])
+    return school[0][1]
+
+
+def nameFromUsername(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select * from login where username=%s"
+    val = (username, )
+    cursor.execute(query, val)
+    name = cursor.fetchall()
+    return name[0][3]
+
+
+def getSubject(teacher, classcode):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select subject from teaches where classcode=%s and teacherUsername=%s"
+    val = (classcode, teacher)
+    cursor.execute(query, val)
+    entry = cursor.fetchall()
+    print(entry)
+    return entry
 
 
 @app.route('/register',methods = ['GET','POST'])
@@ -449,6 +515,32 @@ def register():
             return json.dumps(data)
 
 
+@app.route('/teacher', methods=['POST'])
+def teacher():
+    username = session.get("username")
+    # print(username)
+    classCode = request.form.get('classCode')
+    # print(classCode)
+    schoolsData = schools()
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select * from teacher where teacherUsername=%s and verified=%s"
+    val = (username,'verified')
+    
+    cursor.execute(query, val)
+    teachers = cursor.fetchall()
+    teacher_info= teachers[0]
+    # print(teacher)
+    mycon.close()
+    classes = get_classes_from_teacher(username)
+    # print(classes)
+    classCodes = []
+    for i in range(len(classes)):
+        classCodes.append(classes[i][0])
+    # print (classCodes)
+    return render_template("teacher.html",name=username, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
+
+
 
 @app.route('/signOut')
 def signOut():
@@ -489,7 +581,6 @@ def login():
 
 @app.route('/profile',methods=['POST','GET'])
 def profile():
-       
     try:
         username = session['username']
         mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -539,12 +630,28 @@ def profile():
             return render_template("dashboard.html",editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
+            ##category is a teacher
             schoolsData = schools()
+            # mycon.close()
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            query = "select * from teacher where teacherUsername=%s and verified=%s"
+            val = (username,'verified')
+            # print(username)
+            # print("Heyy")
+            cursor.execute(query, val)
+            teachers = cursor.fetchall()
+            teacher_info= teachers[0]
+            # print(teacher)
             mycon.close()
-            return render_template("template.html",msg=session['msg'],schools = schoolsData,category="teacher")
-    
-    
-    
+            classes = get_classes_from_teacher(username)
+            # print(classes)
+            classCodes = []
+            for i in range(len(classes)):
+                classCodes.append(classes[i][0])
+            # print(classCodes)
+            return render_template("teacher.html",name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
+
     except Exception as e:
         session['msg'] = "Error"
         print(e)
@@ -559,6 +666,122 @@ def setUp():
     school = data[0]
     struct = classes(session['username'])
     return render_template('setup.html',school_info=school,structure=struct)
+
+@app.route('/getStudents',methods=['POST','GET'])
+def getStudents():
+    if request.method == 'POST':
+        data = {}
+        students = []
+        try:
+            classcode = request.get_data()
+            print(classcode)
+            teacher = session.get("username")
+            # print(teacher)
+            school = getSchool(teacher)
+            # print(school)
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            query = "select * from student where classcode=%s and schoolUsername=%s"
+            val = (classcode, school)
+            cursor.execute(query, val)
+            students = cursor.fetchall()
+            subject = getSubject(teacher, classcode)
+            print(subject)
+            # data['subject'] = subject
+            data['students'] = students
+            class_section = []
+            names = []
+            subjects = []
+            for i in students:
+                class_section.append(classFromCode(i[1]))
+                names.append(nameFromUsername(i[0]))
+                subjects.append(subject)
+            data['class_section'] = class_section
+            data['subject'] = subjects
+            data['name'] = names
+            msg='done'
+            
+        except Exception as e:
+            print(e)
+            msg ='error'
+        finally:
+            print(students)
+            print(msg)
+            data['msg'] = msg
+            return data
+
+@app.route('/uploadAnswerKey',methods=['POST','GET'])
+def uploadAnswerKey():
+    if request.method == 'POST':  
+        f = request.files['file']  
+        f.save(f.filename)
+        print(f.filename)
+        # names = request.form['teacher']
+        classcode = request.form['classCode']
+        subject = request.form['subject']
+        print(names,classcode,subject)
+        # print("Teacher Name is : " + str(names))
+        print('Classcode ' + str(classcode))
+        print('subject : ' + str(subject))
+        print(f.filename)
+        src = f.filename
+        dest = 'automated_correction_module/'+ str(names)+'_' + str(classcode) + '_' + str(subject) + '.txt'
+        shutil.move(src, dest)
+
+@app.route('/upload',methods=['POST','GET'])
+def upload():
+    if request.method == 'POST':  
+        f = request.files['file']  
+        f.save(f.filename)
+        print(f.filename)
+        names = request.form['name']
+        classcode = request.form['classCode']
+        subject = request.form['subject']
+        print(names,classcode,subject)
+        print("Name is : " + str(names))
+        print('Classcode ' + str(classcode))
+        print('subject : ' + str(subject))
+        print(f.filename)
+        src = f.filename
+        dest = 'automated_correction_module/input/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+        shutil.move(src, dest)
+    data = {}
+    data['msg'] = "done"
+    print(data)
+    return data
+
+@app.route('/correct', methods=['POST', 'GET'])
+def correct():
+    if(request.method == 'POST'):
+        data = {}
+        print("In /correct")
+        path = 'automated_correction_module/input/'
+        files = os.listdir(path)
+        print(files)
+        for file in files:
+            # img_path = 'input/' + file
+            pipe = subprocess.check_call(["python", "automated_correction_module/word_seg_try.py", path + file])
+            initial_directory = os.path.abspath(os.getcwd())
+            # pipe1 = subprocess.check_call(["python", "word_seg_try.py" , path + file], cwd= initial_directory + '/automated_correction_module/')
+            time.sleep(10)
+            
+            pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+            
+            print("/Correct prediction over")
+            f = open("automated_correction_module/recognized.txt", "r")
+            sent1 = f.read()
+            print(sent1)
+            
+            f2 = open("automated_correction_module/answer_key.txt", "r")
+            sent2 = f2.read()
+            print(sent2)
+
+  
+            messages = [sent1,sent2]
+            print(find_sim(messages))
+
+        return data
+    
 
 @app.route('/getStructure',methods=['POST','GET'])
 def getStructure():
@@ -700,7 +923,8 @@ def approve():
             print(username)
             approved(username)
             data['msg'] = "done"
-        except:
+        except Exception as e:
+            print(e)
             data['msg'] = "Issue"
         finally:
             return data
@@ -718,6 +942,8 @@ def reject():
         finally:
             return data
 
+
+
 @app.route('/student_info',methods=['POST','GET'])
 def student_info():
     if request.method == 'POST':
@@ -733,7 +959,7 @@ def student_info():
             val = (pusr,pas,"parent")
             cursor.execute(sql, val)
             parents = cursor.fetchall()
-            print("hi")
+            # print("hi")
             if(len(parents)==1):
                 parent = pusr
                 print("hi")

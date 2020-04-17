@@ -26,6 +26,7 @@
     .bootstrap-select .btn:focus {
     outline: none !important;
 }
+
   </style>
 
   
@@ -48,12 +49,36 @@
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <!-- <div w3-include-html="static/search.html"></div> -->
             <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <div id="schoolSearchBar" style="width: 250px;" class="form-group no-border dropdown">
+                <input type="text" onkeyup="myFunction()" id="mySearch" style="width: 100%;color:white;" data-toggle="dropdown" class="form-control validate dropdown-toggle" placeholder="Search" required>
+                <input type="text" name="schoolSearch" id="schoolSearch" class="form-control" hidden>
+                
+                <ul id="myUL"class="list-group dropdown-menu" style="width: 250px;">
+                  {% for i in range(schools[1]) %}
+                  <li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-primary searching" id='{{schools[0][i][0]}}' style="text-align: left;">
+                   <div class="d-flex w-100 justify-content-between">
+                      <p class="mb-1">{{schools[0][i][2]}}</p>
+                    </div>
+                    <small>{{schools[0][i][1]}}</small>
+                  </li>
+                  {% endfor %}
+                  <li class="list-group-item list-group-item-action flex-column align-items-start" disabled style="text-align: center;">
+                    <div class="d-flex w-100 justify-content-between">
+                      <small class="mb-1">End of Results</small>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <button type="submit" id="searchSubmit" class="btn btn-white btn-just-icon btn-round">
+                  <i class="material-icons">search</i>
+              </button>
+          </form>
+            <!-- <form class="form-inline ml-auto" method="POST" action="{{ url_for('search') }} ">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             
               <div class="form-group no-border">
-                 <!-- <input type="text" class="form-control" placeholder="Search">  -->
                 <select name="schoolSearch" id="schoolSearch" data-style="btn-outline-primary" class="no-border selectpicker validate" data-live-search="true" title="Search" required>
                   {% for i in range(schools[1]) %}
                   <option data-subtext="{{schools[0][i][1]}}" value="{{schools[0][i][0]}}" >
@@ -66,7 +91,7 @@
               <button type="submit" id="searchSubmit" class="btn btn-white btn-just-icon btn-round">
                   <i class="material-icons">search</i>
               </button>
-          </form>
+          </form> -->
       </li>
       <li class="nav-item">
         <a href="#pablo" class="nav-link">
@@ -330,7 +355,38 @@
 	<script src="static/js/plugins/nouislider.min.js" type="text/javascript"></script>
   <script src="static/js/notify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
- 
+  <script>
+    function myFunction() {
+      // Declare variables
+      console.log("came")
+      var input, filter, ul, li, a, i, txtValue;
+      input = document.getElementById('mySearch');
+      filter = input.value.toUpperCase();
+      ul = document.getElementById("myUL");
+      li = ul.getElementsByTagName('li');
+    
+      // Loop through all list items, and hide those who don't match the search query
+      for (i = 0; i < (li.length-1); i++) {
+        a = li[i].getElementsByTagName("p")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
+      }
+    }
+    </script>
+    <script>
+      $(".searching").click(function(){
+        value = this.id;
+        console.log(value)
+        a = this.getElementsByTagName("p")[0];
+        txtValue = a.textContent || a.innerText;
+        $("#mySearch").val(txtValue);
+        $("#schoolSearch").val(value);
+      });
+    </script>
   <script>
 
     $(function() {
