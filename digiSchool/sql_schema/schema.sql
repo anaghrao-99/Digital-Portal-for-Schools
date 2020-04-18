@@ -87,11 +87,15 @@ foreign key(classcode) references class(classcode));
 
 
 create table schoolNews(
+id int auto_increment not null,
 schoolUsername varchar(45) not null,
 newsArticle varchar(100) not null,
 image varchar(100) ,
+primary key(id),
 foreign key(schoolUsername) references school(schoolUsername));
 
+
+delete from schoolNews where id=4;
 
 create table schoolComments(
 id int auto_increment,
@@ -135,5 +139,6 @@ marks varchar(45) not null,
 primary key(studentUsername, exam, subject),
 foreign key(studentUsername) references student(studentUsername));
 	
-
+select * from notes;
+select * from student;
 

@@ -20,49 +20,6 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
-# from automated_correction_module.semantic import find_sim, run_and_plot, plot_similarity 
-
-# module_url = "/Users/anagh/Desktop/module5"
-  
-# module_url = "D:/sem8/module5"
-
-module_url = "/users/anagh/Desktop/module5"
-embed = hub.KerasLayer(module_url)
-print("module loaded")
-
-
-logging.set_verbosity(logging.ERROR)
-
-def plot_similarity(labels, features, rotation):
-  corr = np.inner(features, features)
-#   sns.set(font_scale=1.2)
-#   g = sns.heatmap(
-#       corr,
-#       xticklabels=labels,
-#       yticklabels=labels,
-#       vmin=0,
-#       vmax=1,
-#       cmap="YlOrRd")
-  # g.set_xticklabels(labels, rotation=rotation)
-  # g.set_title("Semantic Textual Similarity")
-  return corr[0][1]
-
-
-def run_and_plot(session_, input_tensor_, messages_, encoding_tensor):
-  message_embeddings_ = session_.run(
-      encoding_tensor, feed_dict={input_tensor_: messages_})
-  # return plot_similarity(messages_, message_embeddings_, 90)
-
-def find_sim(messages):
-    similarity_input_placeholder = tf.placeholder(tf.string, shape=(None))
-    similarity_message_encodings = embed(similarity_input_placeholder)
-    with tf.Session() as session:
-        session.run(tf.global_variables_initializer())
-        session.run(tf.tables_initializer())
-        return run_and_plot(session, similarity_input_placeholder, messages,
-                    similarity_message_encodings)
-
-
 
 app = Flask(__name__) 
 csrf = CSRFProtect(app)
@@ -500,6 +457,18 @@ def getSubject(teacher, classcode):
     return entry
 
 
+def getActivity(username):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    query = "select newsArticle,image from schoolNews where schoolUsername=%s"
+    val = (username,)
+    cursor.execute(query, val)
+    entry = cursor.fetchall()
+    print(entry)
+    return entry
+    
+
+
 @app.route('/register',methods = ['GET','POST'])
 def register():
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -662,7 +631,8 @@ def profile():
             schoolsData = schools()
             approvals = approval(username)
             mycon.close()
-            return render_template("dashboard.html",editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
+            activity = getActivity(username)
+            return render_template("dashboard.html",activity=activity,editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
             ##category is a teacher
@@ -784,6 +754,44 @@ def getStudents():
             data['msg'] = msg
             return data
 
+@app.route('/uploadActivity',methods=['POST','GET'])
+def uploadActivity():
+    data={}
+    if request.method == 'POST':
+        try:
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            activity = request.form['activity']
+            sql = "insert into schoolNews(schoolUsername,newsArticle) values (%s,%s)"
+            val=(session['username'],activity)
+            cursor.execute(sql,val)
+            mycon.commit()
+            f = request.files['file']  
+            if f.filename == "":
+                return data
+            
+            else:
+                sql = "select max(id) from schoolNews where schoolUsername=%s"
+                val=(session['username'],)
+                cursor.execute(sql,val)
+                table = cursor.fetchall()
+                ids = table[0][0]
+                f.save(f.filename)
+                print(f.filename)
+                
+                src = f.filename
+                dest = 'static/img/activity/'+str(session['username'])+'_' + str(ids) + '.png'
+                shutil.move(src, dest)
+                sql = "update schoolNews set image=%s where id=%s"
+                val=(dest,int(ids))
+                cursor.execute(sql,val)
+                mycon.commit()
+            
+        except Exception as e:
+            print(e)
+            data['msg'] = "error"
+        finally:
+            return data
 
 
 @app.route('/upload',methods=['POST','GET'])
@@ -1069,7 +1077,8 @@ def school():
         schoolsData = schools()
         approvals = approval(school_name)
         mycon.close()
-        return render_template("dashboard.html",editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
+        activity = getActivity(school_name)
+        return render_template("dashboard.html",activity=activity,editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
        
 
 @app.route('/')
