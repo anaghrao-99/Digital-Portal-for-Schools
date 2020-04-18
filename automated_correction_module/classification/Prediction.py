@@ -10,6 +10,7 @@ import shutil
 from keras import backend as K
 from keras.utils import plot_model
 from Spell import correction_list
+import sys
 
 def test_infer(files, file_path, out_file):
 	file_out = open(out_file, 'w')
@@ -77,7 +78,12 @@ if __name__=='__main__':
 	files = os.listdir(file_path)
 	print(files)
 	files.sort()
-	out_file = '../recognized.txt'
+
+	file_string = sys.argv[1]
+	string = file_string.split('.png')[0]
+	string += '.txt'
+	out_file = '../' + string
+	# out_file = '../recognized.txt'
 
 	test_infer(files, file_path, out_file)
 

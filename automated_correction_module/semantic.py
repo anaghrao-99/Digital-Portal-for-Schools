@@ -8,6 +8,7 @@ import os
 import pandas as pd
 import re
 import seaborn as sns
+import sys
 # module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
 # module_url = "D:/sem8/module5"
 module_url = "/users/anagh/Desktop/module5"
@@ -20,16 +21,16 @@ logging.set_verbosity(logging.ERROR)
 def plot_similarity(labels, features, rotation):
   corr = np.inner(features, features)
   sns.set(font_scale=1.2)
-  g = sns.heatmap(
-      corr,
-      xticklabels=labels,
-      yticklabels=labels,
-      vmin=0,
-      vmax=1,
-      cmap="YlOrRd")
+  # g = sns.heatmap(
+  #     corr,
+  #     xticklabels=labels,
+  #     yticklabels=labels,
+  #     vmin=0,
+  #     vmax=1,
+  #     cmap="YlOrRd")
   # g.set_xticklabels(labels, rotation=rotation)
   # g.set_title("Semantic Textual Similarity")
-  return corr[0][1]
+  return corr
 
 
 def run_and_plot(session_, input_tensor_, messages_, encoding_tensor):
@@ -50,16 +51,29 @@ def find_sim(messages):
 
 if __name__ == '__main__':
 
-  f = open("recognized.txt", "r")
-  sent1 = f.read()
-  print(sent1)
+ 
+  answer_key_location = sys.argv[2]
+  answer_key = open(answer_key_location, "r")
+  answer_sent = answer_key.read()
 
-  f2 = open("answer_key.txt", "r")
-  sent2 = f2.read()
-  print(sent2)
-
+  files = sys.argv[1]
   
-  messages = [sent1,sent2]
+
+  print(files)
+  files = files[1:len(files)-1]
+  file_names = files.split(',')
+
+  messages = [answer_sent]
+
+  for i in range(len(file_names)):
+    f = open(file_names[i], 'r')
+    sent = f.read()
+
+    messages.append(sent)
+
+  # print(messages)
+  # messages = [sent1,sent2]
   print(find_sim(messages))
+  
   
 
