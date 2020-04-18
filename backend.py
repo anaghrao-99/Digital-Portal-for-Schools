@@ -10,7 +10,8 @@ import subprocess
 from subprocess import run
 import time
 from absl import logging
-
+import os.path
+from os import path
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -731,6 +732,18 @@ def getStudents():
         students = []
         try:
             classcode = request.get_data()
+            teacher = session['username']
+            path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
+            if(os.path.exists(path)):
+                print("Directory exists")
+                shutil.rmtree(path)
+                os.makedirs(path)
+
+            else:
+                print("directory does not exist creating directory")
+                os.makedirs(path)
+
+
             mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
             cursor = mycon.cursor()
             query = "select * from student where classcode=%s"
@@ -799,18 +812,33 @@ def upload():
     if request.method == 'POST':  
         f = request.files['file']  
         f.save(f.filename)
-        print(f.filename)
+        # print(f.filename)
+        teacher = session['username']
         names = request.form['name']
         classcode = request.form['classCode']
         subject = request.form['subject']
         print(names,classcode,subject)
-        print("Name is : " + str(names))
-        print('Classcode ' + str(classcode))
-        print('subject : ' + str(subject))
-        print(f.filename)
+        # print("Name is : " + str(names))
+        # print('Classcode ' + str(classcode))
+        # print('subject : ' + str(subject))
+        # print(f.filename)
         src = f.filename
-        dest = 'automated_correction_module/input/'+str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
-        shutil.move(src, dest)
+
+        path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
+        print(path)
+        if(os.path.exists(path)):
+            
+            path_files = path + 'input/'
+            if(os.path.exists(path_files)):
+                dest = path_files +str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+                shutil.move(src, dest)
+            else:
+                os.makedirs(path_files)
+                dest = path_files +str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
+                shutil.move(src, dest)
+
+        
+
     data = {}
     data['msg'] = "done"
     print(data)
@@ -821,9 +849,12 @@ def correct():
     if(request.method == 'POST'):
         data = {}
         print("In /correct")
-        path = 'automated_correction_module/input/'
+        teacher = session['username']
+
+        path = 'automated_correction_module/' + teacher + '/input/'
         files = os.listdir(path)
         print(files)
+        recognition_files = []
         for file in files:
             # img_path = 'input/' + file
             if('.png' in file or '.jpg' in file):
@@ -837,21 +868,26 @@ def correct():
                 pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
                 time.sleep(5)
                 print("/Correct prediction over")
-                f = open("automated_correction_module/recognized.txt", "r")
-                sent1 = f.read()
-                print("Recognized" + str(sent1))
 
+                recognition_files.append(file.split('.png')[0] + '.txt')
                 
-                f2 = open("automated_correction_module/answer_key.txt", "r")
-                sent2 = f2.read()
-                print("Answer Key is : " + str(sent2))
+                
 
-      
-                messages = [sent1,sent2]
-                print(messages)
-                # print("finding similarity\n")
-                # print(find_sim(messages))
+        string = "["
+        for i in range(len(recognition_files)):
+            if(i == len(recognition_files) - 1):
+                string += recognition_files[i] + "]"
+            else:
+                string += recognition_files[i] + ","
 
+        path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
+        files = os.listdir(path)
+        for i in range(len(files)):
+            if '.txt' in files[i]:
+                answer_file = files[i]
+
+        pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file], cwd= initial_directory + '/automated_correction_module/')
+        time.sleep(5)
         return data
     
 
@@ -1097,15 +1133,19 @@ def uploadAnswerKey():
         f = request.files['file']  
         f.save(f.filename)
         print(f.filename)
-        
+        teacher = session['username']
         classcode = request.form['classCode']
         subject = request.form['subject']
         print('Classcode ' + str(classcode))
         print('subject : ' + str(subject))
         # print(f.filename)
         src = f.filename
-        dest = 'automated_correction_module/'+ str(classcode) + '_' + str(subject) + '.txt'
-        shutil.move(src, dest)
+        path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
+        print(path)
+        if(os.path.exists(path)):
+            dest = path + str(classcode) + '_' + str(subject) + '.txt'
+            shutil.move(src, dest)
+
     data = {}
     data['msg'] = "done"
     print(data)
