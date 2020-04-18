@@ -26,23 +26,23 @@ import seaborn as sns
   
 # module_url = "D:/sem8/module5"
 
-module_url = "/users/anagh/Desktop/module5"
-embed = hub.KerasLayer(module_url)
-print("module loaded")
+# module_url = "/users/anagh/Desktop/module5"
+# embed = hub.KerasLayer(module_url)
+# print("module loaded")
 
 
 logging.set_verbosity(logging.ERROR)
 
 def plot_similarity(labels, features, rotation):
   corr = np.inner(features, features)
-  sns.set(font_scale=1.2)
-  g = sns.heatmap(
-      corr,
-      xticklabels=labels,
-      yticklabels=labels,
-      vmin=0,
-      vmax=1,
-      cmap="YlOrRd")
+#   sns.set(font_scale=1.2)
+#   g = sns.heatmap(
+#       corr,
+#       xticklabels=labels,
+#       yticklabels=labels,
+#       vmin=0,
+#       vmax=1,
+#       cmap="YlOrRd")
   # g.set_xticklabels(labels, rotation=rotation)
   # g.set_title("Semantic Textual Similarity")
   return corr[0][1]
@@ -683,9 +683,9 @@ def profile():
             # print(classes)
             classCodes = []
             for i in range(len(classes)):
-                classCodes.append(classes[i][0])
+                classCodes.append([classes[i][0],classes[i][1],classFromCode(classes[i][0])])
             # print(classCodes)
-            return render_template("teacher.html",name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
+            return render_template("teacher.html",user=username,name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
 
     except Exception as e:
         session['msg'] = "Error"
@@ -694,6 +694,58 @@ def profile():
         return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
     finally:
         mycon.close()
+
+
+@app.route('/submitNote' , methods=['POST','GET'])
+def submitNote():
+    data={}
+    if request.method == 'POST':
+        try:
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            
+        
+            teacher = request.form['teacher']
+            usr = request.form['student']
+            note = request.form['note']
+            subject = request.form['subject']
+            print(usr)
+            sql = ("insert into notes(studentUsername,teacherUsername,subject,note) values (%s,%s,%s,%s)")
+            val = (usr,teacher,subject,note)
+            cursor.execute(sql, val)
+            mycon.commit()
+            data['msg'] = "done"
+        except Exception as e:
+            print(e)
+            data['msg'] = "error"
+        finally:
+            return data
+
+
+@app.route('/getNotes',methods=['POST','GET'])
+def getNotes():
+    data={}
+    if request.method == 'POST':
+        try:
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            
+            teacher = request.json['teacher']
+            usr = request.json['student']
+            subject = request.json['subject']
+            print(usr)
+            sql = ("select note, signature from notes where studentUsername=%s and teacherUsername=%s and subject=%s")
+            val = (usr,teacher,subject)
+            cursor.execute(sql, val)
+            table=cursor.fetchall()
+            print(table)
+            data['msg'] = "done"
+            data['data'] = table
+        except Exception as e:
+            print(e)
+            data['msg'] = "error"
+        finally:
+            return data
 
 @app.route('/setUp',methods=['POST','GET'])
 def setUp():
@@ -709,31 +761,18 @@ def getStudents():
         students = []
         try:
             classcode = request.get_data()
-            print(classcode)
-            teacher = session.get("username")
-            # print(teacher)
-            school = getSchool(teacher)
-            # print(school)
             mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
             cursor = mycon.cursor()
-            query = "select * from student where classcode=%s and schoolUsername=%s"
-            val = (classcode, school)
+            query = "select * from student where classcode=%s"
+            val = (classcode, )
             cursor.execute(query, val)
-            students = cursor.fetchall()
-            subject = getSubject(teacher, classcode)
-            print(subject)
-            # data['subject'] = subject
-            data['students'] = students
-            class_section = []
-            names = []
-            subjects = []
+            students = list(cursor.fetchall())
+            student = []
             for i in students:
-                class_section.append(classFromCode(i[1]))
-                names.append(nameFromUsername(i[0]))
-                subjects.append(subject)
-            data['class_section'] = class_section
-            data['subject'] = subjects
-            data['name'] = names
+                row=list(i)
+                row.append(getName(i[0]))
+                student.append(row)
+            data['students'] = student
             msg='done'
             
         except Exception as e:
@@ -774,36 +813,36 @@ def correct():
     if(request.method == 'POST'):
         data = {}
         print("In /correct")
-        path = 'automated_correction_module/input/'
-        files = os.listdir(path)
-        print(files)
-        for file in files:
-            # img_path = 'input/' + file
-            if('.png' in file or '.jpg' in file):
+        # path = 'automated_correction_module/input/'
+        # files = os.listdir(path)
+        # print(files)
+        # for file in files:
+        #     # img_path = 'input/' + file
+        #     if('.png' in file or '.jpg' in file):
 
-                initial_directory = os.path.abspath(os.getcwd())
-                # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
+        #         initial_directory = os.path.abspath(os.getcwd())
+        #         # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
                 
-                pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
-                time.sleep(5)
+        #         pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
+        #         time.sleep(5)
                 
-                pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
-                time.sleep(5)
-                print("/Correct prediction over")
-                f = open("automated_correction_module/recognized.txt", "r")
-                sent1 = f.read()
-                print("Recognized" + str(sent1))
+        #         pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+        #         time.sleep(5)
+        #         print("/Correct prediction over")
+        #         f = open("automated_correction_module/recognized.txt", "r")
+        #         sent1 = f.read()
+        #         print("Recognized" + str(sent1))
 
                 
-                f2 = open("automated_correction_module/answer_key.txt", "r")
-                sent2 = f2.read()
-                print("Answer Key is : " + str(sent2))
+        #         f2 = open("automated_correction_module/answer_key.txt", "r")
+        #         sent2 = f2.read()
+        #         print("Answer Key is : " + str(sent2))
 
       
-                messages = [sent1,sent2]
-                print(messages)
-                # print("finding similarity\n")
-                # print(find_sim(messages))
+        #         messages = [sent1,sent2]
+        #         print(messages)
+        #         # print("finding similarity\n")
+        #         # print(find_sim(messages))
 
         return data
     
