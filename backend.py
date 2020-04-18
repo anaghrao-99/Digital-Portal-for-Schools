@@ -26,9 +26,9 @@ import seaborn as sns
   
 # module_url = "D:/sem8/module5"
 
-# module_url = "/users/anagh/Desktop/module5"
-# embed = hub.KerasLayer(module_url)
-# print("module loaded")
+module_url = "/users/anagh/Desktop/module5"
+embed = hub.KerasLayer(module_url)
+print("module loaded")
 
 
 logging.set_verbosity(logging.ERROR)
@@ -813,36 +813,36 @@ def correct():
     if(request.method == 'POST'):
         data = {}
         print("In /correct")
-        # path = 'automated_correction_module/input/'
-        # files = os.listdir(path)
-        # print(files)
-        # for file in files:
-        #     # img_path = 'input/' + file
-        #     if('.png' in file or '.jpg' in file):
+        path = 'automated_correction_module/input/'
+        files = os.listdir(path)
+        print(files)
+        for file in files:
+            # img_path = 'input/' + file
+            if('.png' in file or '.jpg' in file):
 
-        #         initial_directory = os.path.abspath(os.getcwd())
-        #         # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
+                initial_directory = os.path.abspath(os.getcwd())
+                # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
                 
-        #         pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
-        #         time.sleep(5)
+                pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
+                time.sleep(5)
                 
-        #         pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
-        #         time.sleep(5)
-        #         print("/Correct prediction over")
-        #         f = open("automated_correction_module/recognized.txt", "r")
-        #         sent1 = f.read()
-        #         print("Recognized" + str(sent1))
+                pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+                time.sleep(5)
+                print("/Correct prediction over")
+                f = open("automated_correction_module/recognized.txt", "r")
+                sent1 = f.read()
+                print("Recognized" + str(sent1))
 
                 
-        #         f2 = open("automated_correction_module/answer_key.txt", "r")
-        #         sent2 = f2.read()
-        #         print("Answer Key is : " + str(sent2))
+                f2 = open("automated_correction_module/answer_key.txt", "r")
+                sent2 = f2.read()
+                print("Answer Key is : " + str(sent2))
 
       
-        #         messages = [sent1,sent2]
-        #         print(messages)
-        #         # print("finding similarity\n")
-        #         # print(find_sim(messages))
+                messages = [sent1,sent2]
+                print(messages)
+                # print("finding similarity\n")
+                # print(find_sim(messages))
 
         return data
     
