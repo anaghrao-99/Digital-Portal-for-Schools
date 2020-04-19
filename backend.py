@@ -543,7 +543,10 @@ def teacher():
     for i in range(len(classes)):
         classCodes.append(classes[i][0])
     # print (classCodes)
-    return render_template("teacher.html",name=username, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
+    profile = 1
+    if os.path.exists("static/img/faces/"+username+".png"):
+        profile = 0
+    return render_template("teacher.html",profile=profile,name=username, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
 
 
 
@@ -598,6 +601,12 @@ def profile():
         name = account[3]
         category = account[2]
         session['msg'] = "Welcome user"
+        profile = 1
+        if os.path.exists("static/img/faces/"+username+".png"):
+            profile = 0
+        profile1 = 1
+        if os.path.exists("static/img/faces/"+session['username']+".png"):
+            profile1 = 0
         if(category == "student"):
             sql = "select * from student where studentUsername=%s"
             val = (username,)
@@ -617,7 +626,7 @@ def profile():
                 else:
                     notes = data[2]
                     mycon.close()
-                    return render_template("profile.html",notes=notes,msg=session['msg'],user=username, name=name,studentInfo=studentinfo,schools=schoolsData,category="student")
+                    return render_template("profile.html",profile=profile,notes=notes,msg=session['msg'],user=username, name=name,studentInfo=studentinfo,schools=schoolsData,category="student")
         elif(category == "parent"):
             schoolsData = schools()
             children = studentList(username)
@@ -633,7 +642,7 @@ def profile():
             approvals = approval(username)
             mycon.close()
             activity = getActivity(username)
-            return render_template("dashboard.html",activity=activity,editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
+            return render_template("dashboard.html",profile1=profile1,profile=profile,activity=activity,editAllowed="N",approvals=approvals,schools=schoolsData,user = username,name=name, school_info = school_info, school_comments = comments,category="school")
             
         else:
             ##category is a teacher
@@ -656,7 +665,8 @@ def profile():
             for i in range(len(classes)):
                 classCodes.append([classes[i][0],classes[i][1],classFromCode(classes[i][0])])
             # print(classCodes)
-            return render_template("teacher.html",user=username,name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
+            
+            return render_template("teacher.html",profile=profile,user=username,name=name, msg=session['msg'],schools = schoolsData,category="teacher", teacher_info = teacher_info, classCodes=classCodes)
 
     except Exception as e:
         session['msg'] = "Error"
@@ -723,7 +733,10 @@ def setUp():
     data = schoolInformation(session['username'])
     school = data[0]
     struct = classes(session['username'])
-    return render_template('setup.html',school_info=school,structure=struct)
+    profile = 1
+    if os.path.exists("static/img/faces/"+session['username']+".png"):
+        profile = 0
+    return render_template('setup.html',profile=profile,school_info=school,structure=struct)
 
 @app.route('/getStudents',methods=['POST','GET'])
 def getStudents():
@@ -807,6 +820,21 @@ def uploadActivity():
             return data
 
 
+@app.route('/uploadPhoto',methods=['POST','GET'])
+def uploadPhoto():
+    if request.method == 'POST':  
+        f = request.files['file']  
+        f.save(f.filename)
+        src = f.filename
+
+        path = os.path.abspath(os.getcwd()) + '/static/img/faces/' + session['username'] +'.png'
+        dest = path
+        shutil.move(src, dest)
+    data = {}
+    data['msg'] = "done"
+    print(data)
+    return data
+
 @app.route('/upload',methods=['POST','GET'])
 def upload():
     if request.method == 'POST':  
@@ -836,9 +864,6 @@ def upload():
                 os.makedirs(path_files)
                 dest = path_files +str(names)+'_' + str(classcode) + '_' + str(subject) + '.png'
                 shutil.move(src, dest)
-
-        
-
     data = {}
     data['msg'] = "done"
     print(data)
@@ -870,9 +895,6 @@ def correct():
                 print("/Correct prediction over")
 
                 recognition_files.append(file.split('.png')[0] + '.txt')
-                
-                
-
         string = "["
         for i in range(len(recognition_files)):
             if(i == len(recognition_files) - 1):
@@ -963,6 +985,33 @@ def vote():
             data['msg'] = msg
             return data
 
+@app.route('/childProfile',methods=['POST','GET'])
+def childProfile():
+    try:
+        susername = session['child'][0]
+        username = session['child'][1]
+        name = session['child'][2]
+        children = studentList(username)
+        usernameList = children[0]
+        count=children[1]
+        data = studentdata(susername)
+        studentinfo = data[0]
+        verified = data[1]
+        schoolsData = schools()
+        if(verified == 'pending'):
+            session['msg'] = "Verification of your child is pending"
+            print("hi")
+            return render_template("pending.html",child=child,msg=session['msg'],user=username,name=name,studentInfo=studentinfo,schools=schoolsData,category="parent",children=usernameList,count=count)
+        else:
+            notes = data[2]
+            profile = 1
+            if os.path.exists("static/img/faces/"+susername+".png"):
+                profile = 0
+            return render_template("childProfile.html",suser=susername,profile=profile,child=child,notes=notes,studentInfo=studentinfo,msg=session['msg'],user=username, name=name,schools=schoolsData,category="parent",children=usernameList,count=count)
+    except Exception as e:
+        print(e)
+        return redirect('/profile')
+
 
 @app.route('/child',methods=['POST','GET'])
 def child():
@@ -971,22 +1020,8 @@ def child():
             susername = request.form['susername']
             username = request.form['username']
             name = request.form['name']
-            
-            children = studentList(username)
-            usernameList = children[0]
-            count=children[1]
-            data = studentdata(susername)
-            studentinfo = data[0]
-            verified = data[1]
-            schoolsData = schools()
-            print(verified)
-            if(verified == 'pending'):
-                session['msg'] = "Verification of your child is pending"
-                print("hi")
-                return render_template("pending.html",child=child,msg=session['msg'],user=username,name=name,studentInfo=studentinfo,schools=schoolsData,category="parent",children=usernameList,count=count)
-            else:
-                notes = data[2]
-                return render_template("childProfile.html",child=child,notes=notes,studentInfo=studentinfo,msg=session['msg'],user=username, name=name,schools=schoolsData,category="parent",children=usernameList,count=count)
+            session['child'] = list([susername,username,name])
+            return redirect('/childProfile')
         except Exception as e:
             print(e)
             return redirect('/profile')
@@ -1114,7 +1149,13 @@ def school():
         approvals = approval(school_name)
         mycon.close()
         activity = getActivity(school_name)
-        return render_template("dashboard.html",activity=activity,editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
+        profile = 1
+        if os.path.exists("static/img/faces/"+school_name+".png"):
+            profile = 0
+        profile1 = 1
+        if os.path.exists("static/img/faces/"+session['username']+".png"):
+            profile1 = 0
+        return render_template("dashboard.html",profile1=profile1,profile=profile,activity=activity,editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
        
 
 @app.route('/')

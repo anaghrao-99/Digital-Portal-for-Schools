@@ -28,6 +28,30 @@
     .bootstrap-select .btn:focus {
     outline: none !important;
 }
+#layer2{
+  text-align: center;
+  position: absolute;
+  z-index: 1;
+  top:200px;
+  right:4.5%;
+  bottom: 20px;
+  /* left: 170px; */
+  left: 4.5%;
+  
+  background-color: rgba(105,105,105, 0.5);
+}
+#layer2 i{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+#after{
+  position: relative;
+  z-index: 0;
+}
   </style>
 
 <style>
@@ -56,10 +80,23 @@
   <div class="wrapper ">
     <div class="sidebar" data-color="purple" data-background-color="white">
       <div class="logo">
-        <div class="profile-photo-small" style="text-align: center;">
-          <img src="static/img/faces/avatar.jpg" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
-          
-          </div>
+        <div class="row" >
+          <div class="col-sm-2"></div>
+          <div class="col-sm-8" >
+            <form class="form" method="POST" id="photoForm" enctype="multipart/form-data">
+            <label>
+              <input type="file" name="file" id="photo" hidden/>
+              <div class="profile-photo-small" >
+                {% if profile==1 %}
+                <img src="static/img/faces/profile.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% else %}
+                <img src="static/img/faces/{{user}}.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% endif %}
+              </div>
+            </label>
+          </form>
+        </div>
+    </div>
         <div style="text-align: center; padding: 10%;">
           <h3>{{ name }}</h3>
         </div>
@@ -150,9 +187,13 @@
               </li>
                 <li class="dropdown nav-item user ">
                   <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
-                    <div class="profile-photo-small">
-                      <img src="static/img/faces/avatar.jpg" alt="Circle Image" class="rounded-circle img-fluid">
-                    </div>
+                    <div class="profile-photo-small"> 
+                    {% if profile==1 %}
+                    <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid"">
+                    {% else %}
+                    <img src="static/img/faces/{{user}}.png" alt="Circle Image" class="rounded-circle img-fluid">
+                    {% endif %}
+              </div>
                   </a>
                     <div class="dropdown-menu dropdown-menu-right">
                       <a href="/profile" class="dropdown-header">{{ name }}</a>
@@ -226,15 +267,6 @@
         </div>
       <div class="content">
         <div class="container-fluid">
-          <!-- <div class="row">
-            <div class = "col-sm-8">
-              <div class="section" id="carousel">
-                <div class="container">
-                      
-                </div>
-              </div>
-            </div>
-          </div> -->
           <div class="card">
                 <div class="card-header card-header-primary">
                   <h5 class="card-title  " >Class</h5>
@@ -288,7 +320,7 @@
                 <br/>
                 
                 <br/>
-                <div style="margin-left:5%; margin-right: 5%;"id="after">
+                <div style="margin-left:5%; margin-right: 5%;" id="after">
                   <table class="table" id="studentTable">
                       <thead>
                         <th>
@@ -311,6 +343,7 @@
                         
                       </tbody>
                     </table>
+                    
                     <div id = "answerkey">
                       <!-- <div style="margin-left:5%; "><h5>Provide Answer Key</h5></div> -->
                       <form  id = "answerkey_upload" class="form" method = "post" enctype="multipart/form-data">
@@ -333,9 +366,16 @@
                     
                     </div>
                 </div>
+                <div id="layer2">
+                  <i class="fa fa-circle-o-notch fa-spin" style="font-size:24px"></i>
+                </div>
                 <br/>
               </div>
             </div>
+
+            
+
+
           </div>
           
           </div>
@@ -369,6 +409,29 @@
   <script src="static/js/notify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <script>
+    $("#photo").change(function(){
+      formName = "#photoForm" 
+      var form = $(formName)[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url : '/uploadPhoto',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+              location.reload();
+              
+            },
+            error: function(data) {
+              
+            },
+        }).done(function(data) {
+          console.log("done")
+        });
+    });
     $("#answerFile").change(function(e){
       var fileName = e.target.files[0].name;
       $("#filedisplay").val(fileName)
@@ -672,6 +735,7 @@
         $("#filedisplay").notify("Upload Answer Key","danger")
       }
       console.log("Into Correct function")
+      $("#layer2").show();
       $.ajax({
             url : '/correct',
             type: 'POST',
@@ -683,7 +747,9 @@
               console.log("success")
 
             },
-      });
+      }).done(function(data) {
+         $("#layer2").hide();
+        });
     };
 
   </script>
@@ -696,6 +762,7 @@
           $("#after").hide();
           $(".afterClass").hide();
           $("#answerkey").hide();
+          $("#layer2").hide();
         });
 
 

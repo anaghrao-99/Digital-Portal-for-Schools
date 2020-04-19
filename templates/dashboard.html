@@ -56,9 +56,25 @@
   <div class="wrapper ">
     <div class="sidebar" data-color="purple" data-background-color="white">
       <div class="logo">
-        <div class="profile-photo-small" style="text-align: center;">
-            <img src="static/img/faces/{{school_info[0][0]}}.jpg" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
-          </div>
+        <div class="row" >
+          <div class="col-sm-2"></div>
+          <div class="col-sm-8" >
+            <form class="form" method="POST" id="photoForm" enctype="multipart/form-data">
+            <label>
+              {% if category=="school"%}
+              <input type="file" name="file" id="photo" hidden/>
+              {%endif%}
+              <div class="profile-photo-small" >
+                {% if profile==1 %}
+                <img src="static/img/faces/profile.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% else %}
+                <img src="static/img/faces/{{school_info[0][0]}}.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% endif %}
+              </div>
+            </label>
+          </form>
+        </div>
+    </div>
         <div style="text-align: center; padding: 10%;">
           <h3>{{ school_info[0][4] }}</h3>
         </div>
@@ -128,7 +144,11 @@
                 <li class="dropdown nav-item user ">
                   <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
                     <div class="profile-photo-small">
-                      <img src="static/img/faces/avatar.jpg" alt="Circle Image" class="rounded-circle img-fluid">
+                    {% if profile1==1 %}
+                    <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid"">
+                    {% else %}
+                    <img src="static/img/faces/{{user}}.png" alt="Circle Image" class="rounded-circle img-fluid">
+                    {% endif %}
                     </div>
                   </a>
                     <div class="dropdown-menu dropdown-menu-right">
@@ -142,8 +162,12 @@
                 <li class="dropdown nav-item schools">
                     <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
                       <div class="profile-photo-small">
-                        <img src="static/img/faces/{{school_info[0][0]}}.jpg" alt="Circle Image" class="rounded-circle img-fluid">
-                      </div>
+                      {% if profile==1 %}
+                    <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid">
+                    {% else %}
+                    <img src="static/img/faces/{{user}}.png" alt="Circle Image" class="rounded-circle img-fluid">
+                    {% endif %}
+                    </div>
                     </a>
                       <div class="dropdown-menu dropdown-menu-right">
                         <h6 class="dropdown-header">{{ user }}</h6>
@@ -580,7 +604,6 @@
         </div>
       </footer>
     </div>
-  </div>
   <script src="static/js/core/jquery.min.js" type="text/javascript"></script>
   <script src="static/js/core/popper.min.js" type="text/javascript"></script>
   <script src="static/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
@@ -592,6 +615,30 @@
   <script src="static/js/notify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <script>
+    $("#photo").change(function(){
+      formName = "#photoForm" 
+      var form = $(formName)[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url : '/uploadPhoto',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+              location.reload();
+              
+            },
+            error: function(data) {
+              
+            },
+        }).done(function(data) {
+          console.log("done")
+        });
+    });
+
     function activitySubmit(){
       event.preventDefault();
       formName = "#activityForm"

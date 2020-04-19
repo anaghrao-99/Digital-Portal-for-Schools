@@ -101,7 +101,7 @@
       <li class="dropdown nav-item">
         <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
           <div class="profile-photo-small">
-            <img src="static/img/faces/avatar.jpg" alt="Circle Image" class="rounded-circle img-fluid">
+            <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid">
           </div>
         </a>
         <div class="dropdown-menu dropdown-menu-right">
@@ -125,50 +125,6 @@
     </div>
   </nav>
 
-<div class="modal fade" id="loginModal" tabindex="-1" role="">
-    <div class="modal-dialog modal-login" role="document">
-        <div class="modal-content">
-            <div class="card card-signup card-plain">
-                <div class="modal-header">
-                    <div class="card-header card-header-primary ">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="material-icons">clear</i></button>
-                        <h3 class="card-title">Login</h3>
-                        <h7>to explore more..</h7>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <form class="form" method="POST" action="{{ url_for('login') }}">
-                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            
-                        <div class="card-body">
-                            <div class="form-group bmd-form-group">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <i class="material-icons">perm_identity</i>
-                                    </span>
-                                    <input type="text" class="form-control" id="username1" name="username1" placeholder="Username">
-                                </div>
-                            </div>
-
-                            <div class="form-group bmd-form-group">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <i class="material-icons">lock_outline</i>
-                                    </span>
-                                    <input type="password" placeholder="Password" id="password1" name="password1" class="form-control">
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer justify-content-center">
-                          <input class="btn btn-primary btn-link btn-wd btn-lg" type = "submit" value="login"/>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
   <div class="page-header header-filter" data-parallax="true" style="background-image: url('static/img/locker.jpg')">
     <div class="container">
       <div class="row">

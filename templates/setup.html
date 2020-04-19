@@ -35,9 +35,23 @@
   <div class="wrapper ">
     <div class="sidebar" data-color="purple" data-background-color="white">
       <div class="logo">
-        <div class="profile-photo-small" style="text-align: center;">
-            <img src="static/img/faces/{{school_info[0][0]}}.jpg" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
-          </div>
+        <div class="row" >
+          <div class="col-sm-2"></div>
+          <div class="col-sm-8" >
+            <form class="form" method="POST" id="photoForm" enctype="multipart/form-data">
+            <label>
+              <input type="file" name="file" id="photo" hidden/>
+              <div class="profile-photo-small" >
+                {% if profile==1 %}
+                <img src="static/img/faces/profile.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% else %}
+                <img src="static/img/faces/{{user}}.png" alt="Circle Image"  style="height:150px;" class="rounded-circle img-fluid">
+                {% endif %}
+              </div>
+            </label>
+          </form>
+        </div>
+    </div>
         <div style="text-align: center; padding: 10%;">
           <h3>{{ school_info[0][4] }}</h3>
         </div>
@@ -192,7 +206,29 @@
   <!-- <script src="static/js/jquery.scrolling-tabs.js"></script> -->
   <script>
 
-      
+$("#photo").change(function(){
+      formName = "#photoForm" 
+      var form = $(formName)[0];
+      var formData = new FormData(form);
+      $.ajax({
+        url : '/uploadPhoto',
+            type: 'POST',
+            enctype: 'multipart/form-data',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success:function(data){
+              console.log("success")
+              location.reload();
+              
+            },
+            error: function(data) {
+              
+            },
+        }).done(function(data) {
+          console.log("done")
+        });
+    });
 
     
     $("#class").change(function(){
