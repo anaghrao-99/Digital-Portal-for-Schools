@@ -928,11 +928,16 @@ def correct():
 
             counter += 1
 
+        maxMarks= request.get_data()
+        print(maxMarks)
+        # maxMarks = request.form['max']
+        print(maxMarks)
         for i in range(len(files)):
-            data[files[i].split('_')[0]] = marks[i+1]
+            data[files[i].split('_')[0]] = round(float(marks[i+1])*int(maxMarks))
+            # print(data[files[i].split('_')[0]])
         # time.sleep(5)
 
-
+        data['msg']= 'done'
         return data
     
 
