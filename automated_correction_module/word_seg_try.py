@@ -88,7 +88,7 @@ for i, ctr in enumerate(sorted_ctrs):
 
     # show ROI
     #print('segment no:' + str(i))
-    cv2.imshow('segment no:'+str(i),roi)
+    # cv2.imshow('segment no:'+str(i),roi)
     string = 'out_test/'
 
     string+= str(i)

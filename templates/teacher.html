@@ -336,10 +336,10 @@
                           Status
                         </th>
                         <th>
-                          Marks
+                          Notes
                         </th>
                         <th>
-                          Notes
+                          Marks
                         </th>
                       </thead>
                       <tbody id="students">
@@ -349,19 +349,44 @@
                     
                     <div id = "answerkey">
                       <!-- <div style="margin-left:5%; "><h5>Provide Answer Key</h5></div> -->
+                      
                       <form  id = "answerkey_upload" class="form" method = "post" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="teacher" value="{{ name }}">
                         <input type="hidden" id="answerSubject" name="subject" value=''>
                         <input type="hidden" id="classAnswer" name="classCode" value = ''>
-                        <!-- <input type="file" name="file"> -->
-                        <label class="btn btn-primary btn-round" style="width:fit-content;background-color: grey">
-                          <input type="file" name="file" id="answerFile" hidden/>
-                          <i class="material-icons">cloud_upload</i>
-                          Answer Key
-                      </label>
-                        <input  id="filedisplay" style="border: none; padding-top: 1.5%;padding-left: 1.5%;" type="text" value="No File Selected">
+                            <!-- <input type="file" name="file"> -->
+                        <div class="row">
+                          <div class="col-md-6">
+                            <label class="btn btn-primary btn-round" style="width:fit-content;background-color: grey">
+                              <input type="file" name="file" id="answerFile" hidden/>
+                              <i class="material-icons">cloud_upload</i>
+                              Answer Key
+                            </label>
+                            <input  id="filedisplay" style="border: none; padding-top: 1.5%;padding-left: 1.5%;" type="text" value="No File Selected">
+
+                          </div>
+                          <div class="col-md-1"></div>
+                          <div class="col-md-3">
+
+                            <form method='POST' class="form">
+                              <!-- <div class="form-group"> -->
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                              <label class="form-check-label">Max Marks</label>
+                              <input type="text" class="form-control" name="max" id = "maxMarks" required>
+                              <!-- </div> -->
+
+                              
+                            </form>
+                          </div>
+                        </div>
+
+
                       </form>
+                        
+                      
+                     
+                      
                     </div>
                     <br/>
                     <div>
@@ -547,16 +572,17 @@
               content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
               content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value="'+id+'">';
               content += '<label class="btn btn-secondary" style="width:fit-content;"><input type="file" name="file" onChange="uploadAnswer(this.id)" id="'+i+'id" hidden/><i class="material-icons">cloud_upload</i> Answer Script</label><input  id="'+i+'idfiledisplay" style="border: none; padding-top: 3%;padding-left: 3%;" type="text" value="No File Selected">'
-              content += '</form></td> <td id=' + students[i][0] + '></td>'
+              content += '</form></td>'
               // content += '<input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button>'
               content += '<td ><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td><td><button id="'+students[i][6]+'/'+students[i][0]+'" class="btn btn-round btn-primary submit_note" onclick="notes(this.id)"> Submit Note </button> </td>'
+              content += '<td id=' + students[i][0] + '></td>'
              
               $("#students").append(content)
               $("#after").show();
               $(".afterClass").show()
               $("#exampleRadios1").prop("checked", true)
-              $('#students td:nth-child(6),#studentTable th:nth-child(6)').hide();
-              $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
+              $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
+              $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
               $('#students td:nth-child(3),#studentTable th:nth-child(3)').show();
               $('#students td:nth-child(4),#studentTable th:nth-child(4)').show();
               $('#correct_button').show()
@@ -610,7 +636,7 @@
                 $("#noNote").hide()
                 var i=0
                 $("#noteDisplay tr").remove();
-                content=""
+                content+=""
                 for(i=0;i<table.length;i++){
                   content += '<tr><td>'+(i+1)+'</td>'
                   content += '<td>'
@@ -643,16 +669,16 @@
             if(radioValue == "notes"){
 
                 // console.log(radioValue)
-                $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
-                $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
+                $('#students td:nth-child(6),#studentTable th:nth-child(6)').hide();
+                $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
                 $('#students td:nth-child(3),#studentTable th:nth-child(3)').hide();
                 $('#students td:nth-child(4),#studentTable th:nth-child(4)').hide();
                 $('#correct_button').hide()
                 $("#answerkey").hide();
             }
             else{
-              $('#students td:nth-child(6),#studentTable th:nth-child(6)').hide();
-              $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
+              $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
+              $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
               $('#students td:nth-child(3),#studentTable th:nth-child(3)').show();
               $('#students td:nth-child(4),#studentTable th:nth-child(4)').show();
               $('#correct_button').show()
@@ -742,19 +768,34 @@
       {
         $("#filedisplay").notify("Upload Answer Key","danger")
       }
+      
+      // var formData = new FormData(document.getElementById("maxMarks"))
+      var value = document.getElementById("maxMarks").value
+      console.log(value)
       console.log("Into Correct function")
       $("#layer2").show();
       $.ajax({
             url : '/correct',
             type: 'POST',
-            enctype: 'multipart/form-data',
-            data: null,
+            data: value,
+            dataType: 'json',
             processData: false,
             contentType: false,
+            
             success:function(data){
-              if(data['msg'] == done){
+              if(data['msg'] == 'done'){
                 console.log("success")
                 console.log(data)
+
+                const keys = Object.keys(data)
+                for(i=0;i<keys.length;i++){
+                  if(keys[i] != 'msg'){
+                    var id = '#' + keys[i]
+                    $(id).append(data[keys[i]]);
+                    console.log(data[keys[i]])
+                  }
+                }
+
 
               }
               
