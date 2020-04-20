@@ -10,10 +10,10 @@ import re
 import seaborn as sns
 import sys
 # module_url = "/Users/anagh/Desktop/Digital-Portal-for-Schools/automated_correction_module/module5"  
-module_url = "D:/sem8/module5"
-# module_url = "/users/anagh/Desktop/module5"
+# module_url = "D:/sem8/module5"
+module_url = "/users/anagh/Desktop/module5"
 embed = hub.KerasLayer(module_url)
-print("module loaded")
+# print("module loaded")
 
 
 logging.set_verbosity(logging.ERROR)
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
   files = sys.argv[1]
   
-
+  
   print(files)
   files = files[1:len(files)-1]
   file_names = files.split(',')

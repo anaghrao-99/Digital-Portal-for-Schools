@@ -8,6 +8,7 @@ from imutils import contours
 import sys 
 import subprocess
 import os
+from pathlib import Path 
 
 filename_input = sys.argv[1]
 
@@ -70,6 +71,11 @@ for ctr in ctrs :
 sorted_ctrs = sorted(ctrs, key=lambda ctr: get_contour_precedence(ctr, img_dilation.shape[1]))
 
 # sorted_ctrs = sorted(ctrs, key=lambda ctr: cv2.boundingRect(ctr)[0] + cv2.boundingRect(ctr)[1] * image.shape[1] )
+path = os.path.abspath(os.getcwd()) + '/out_test/'
+if(os.path.exists(path)):
+
+    for f in Path(path).glob('*.png'):
+        f.unlink()
 
 
 for i, ctr in enumerate(sorted_ctrs):
@@ -84,6 +90,7 @@ for i, ctr in enumerate(sorted_ctrs):
     #print('segment no:' + str(i))
     cv2.imshow('segment no:'+str(i),roi)
     string = 'out_test/'
+
     string+= str(i)
     string += '.png'
     # initial_directory = os.path.abspath(os.getcwd())

@@ -888,13 +888,14 @@ def correct():
                 # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
                 
                 pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
-                time.sleep(5)
+                time.sleep(3)
                 
                 pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
-                time.sleep(5)
+                # time.sleep(5)
                 print("/Correct prediction over")
 
                 recognition_files.append(file.split('.png')[0] + '.txt')
+
         string = "["
         for i in range(len(recognition_files)):
             if(i == len(recognition_files) - 1):
@@ -908,8 +909,30 @@ def correct():
             if '.txt' in files[i]:
                 answer_file = files[i]
 
-        pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file], cwd= initial_directory + '/automated_correction_module/')
-        time.sleep(5)
+        
+        with open('marks.txt', "w") as f:
+            pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file],stdout= f, cwd= initial_directory + '/automated_correction_module/')
+
+
+        file = open('marks.txt', "r")
+        counter = 0
+        for line in file:
+            if(counter > 1):
+                break
+            if(counter == 0):
+                files = line[1:len(line)-2].split(',')
+
+            if(counter == 1):
+                marks = line[2:len(line)-2].split()
+
+
+            counter += 1
+
+        for i in range(len(files)):
+            data[files[i].split('_')[0]] = marks[i+1]
+        # time.sleep(5)
+
+
         return data
     
 
