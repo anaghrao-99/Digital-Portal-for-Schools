@@ -1137,10 +1137,14 @@ def school():
     user = ""
     name = ""
     editAllowed = "N"
+    profile1 = 1
+    
     if 'username' in session:
         user = session['username']
         editAllowed = isAssociated(school_name)
         name = getName(user)
+        if os.path.exists("static/img/faces/"+session['username']+".png"):
+            profile1 = 0
     if(len(school_info) != 0):
         data = schoolInformation(school_name)
         school_info = data[0]
@@ -1152,11 +1156,10 @@ def school():
         profile = 1
         if os.path.exists("static/img/faces/"+school_name+".png"):
             profile = 0
-        profile1 = 1
-        if os.path.exists("static/img/faces/"+session['username']+".png"):
-            profile1 = 0
+        
         return render_template("dashboard.html",profile1=profile1,profile=profile,activity=activity,editAllowed=editAllowed,approvals=approvals,schools=schoolsData,user = user,name=name, school_info = school_info, school_comments = comments,category="viewer")
-       
+    else:
+        return redirect('/')
 
 @app.route('/')
 def index():
