@@ -76,6 +76,7 @@ if __name__=='__main__':
 	# test_img = 'Users/anagh/Desktop/out_test/1.png'
 	# test_img = 'Resource/test_img/5.png'
 	files = os.listdir(file_path)
+	
 	print(files)
 	files.sort()
 

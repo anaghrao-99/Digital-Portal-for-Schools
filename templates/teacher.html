@@ -336,6 +336,9 @@
                           Status
                         </th>
                         <th>
+                          Marks
+                        </th>
+                        <th>
                           Notes
                         </th>
                       </thead>
@@ -538,19 +541,22 @@
             $("#answerkey").show();
             }
             for(i=0;i<students.length;i++){
-              content = '<tr><th><b>'+ students[i][6]+'</b></th><th>'+id+'</th>'
+              // console.log(students[i])
+              content = '<tr ><th><b>'+ students[i][6]+'</b></th><th>'+id+'</th>'
               
               content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
               content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value="'+id+'">';
               content += '<label class="btn btn-secondary" style="width:fit-content;"><input type="file" name="file" onChange="uploadAnswer(this.id)" id="'+i+'id" hidden/><i class="material-icons">cloud_upload</i> Answer Script</label><input  id="'+i+'idfiledisplay" style="border: none; padding-top: 3%;padding-left: 3%;" type="text" value="No File Selected">'
+              content += '</form></td> <td id=' + students[i][0] + '></td>'
               // content += '<input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button>'
-              content += '</form></td><td ><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td><td><button id="'+students[i][6]+'/'+students[i][0]+'" class="btn btn-round btn-primary submit_note" onclick="notes(this.id)"> Submit Note </button> </td>'
+              content += '<td ><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td><td><button id="'+students[i][6]+'/'+students[i][0]+'" class="btn btn-round btn-primary submit_note" onclick="notes(this.id)"> Submit Note </button> </td>'
              
               $("#students").append(content)
               $("#after").show();
               $(".afterClass").show()
               $("#exampleRadios1").prop("checked", true)
-              $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
+              $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
+              $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
               $('#students td:nth-child(3),#studentTable th:nth-child(3)').show();
               $('#students td:nth-child(4),#studentTable th:nth-child(4)').show();
               $('#correct_button').show()
@@ -637,14 +643,16 @@
             if(radioValue == "notes"){
 
                 // console.log(radioValue)
-                $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
+                $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
+                $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
                 $('#students td:nth-child(3),#studentTable th:nth-child(3)').hide();
                 $('#students td:nth-child(4),#studentTable th:nth-child(4)').hide();
                 $('#correct_button').hide()
                 $("#answerkey").hide();
             }
             else{
-              $('#students td:nth-child(5),#studentTable th:nth-child(5)').hide();
+              $('#students td:nth-child(6),#studentTable th:nth-child(6)').hide();
+              $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
               $('#students td:nth-child(3),#studentTable th:nth-child(3)').show();
               $('#students td:nth-child(4),#studentTable th:nth-child(4)').show();
               $('#correct_button').show()
@@ -744,11 +752,17 @@
             processData: false,
             contentType: false,
             success:function(data){
-              console.log("success")
+              if(data['msg'] == done){
+                console.log("success")
+                console.log(data)
+
+              }
+              
 
             },
       }).done(function(data) {
          $("#layer2").hide();
+
         });
     };
 
