@@ -555,7 +555,7 @@
               $("#after").show();
               $(".afterClass").show()
               $("#exampleRadios1").prop("checked", true)
-              $('#students td:nth-child(6),#studentTable th:nth-child(6)').show();
+              $('#students td:nth-child(6),#studentTable th:nth-child(6)').hide();
               $('#students td:nth-child(5),#studentTable th:nth-child(5)').show();
               $('#students td:nth-child(3),#studentTable th:nth-child(3)').show();
               $('#students td:nth-child(4),#studentTable th:nth-child(4)').show();
@@ -612,7 +612,7 @@
                 $("#noteDisplay tr").remove();
                 content=""
                 for(i=0;i<table.length;i++){
-                  content = '<tr><td>'+(i+1)+'</td>'
+                  content += '<tr><td>'+(i+1)+'</td>'
                   content += '<td>'
                   content +=  table[i][0]
                   content +='</td><td>'
