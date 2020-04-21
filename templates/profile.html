@@ -26,8 +26,8 @@
 </head>
 
 <body>
-  <div class="wrapper ">
-    <div class="sidebar" data-color="purple" data-background-color="white">
+  <div class="wrapper " >
+    <div class="sidebar" style="height:100%;background-image: url('static/img/bg14.jpg');" data-color="purple" data-background-color="black">
       <div class="logo">
         <div class="row" >
           <div class="col-sm-2"></div>
@@ -46,11 +46,11 @@
           </form>
         </div>
     </div>
-        <div style="text-align: center; padding: 10%;">
+        <div style="text-align: center; padding: 10%;color: white;">
           <h3>{{ studentInfo[0]}}</h3>
         </div>
       </div>
-      <div class="sidebar-wrapper">
+      <div class="sidebar-wrapper" style="color: white;">
         <ul class="nav">
           <li>
             <div>
@@ -76,7 +76,7 @@
         </ul>
       </div>
     </div>
-    <div class="main-panel">
+    <div class="main-panel" style="height:100%;background-image: url('static/img/bg26.jpg');background-size: 100%;">
       <nav class="navbar navbar-transparent navbar-color-on-scroll fixed-top navbar-expand-lg" color-on-scroll="100" id="sectionsNav">
         <div class="container-fluid">
           <div class="navbar-translate">
@@ -99,7 +99,7 @@
                 <a href="#pablo" class="profile-photo dropdown-toggle nav-link" data-toggle="dropdown">
                   <div class="profile-photo-small">
                     {% if profile==1 %}
-                    <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid"">
+                    <img src="static/img/faces/profile.png" alt="Circle Image" class="rounded-circle img-fluid">
                     {% else %}
                     <img src="static/img/faces/{{user}}.png" alt="Circle Image" class="rounded-circle img-fluid">
                     {% endif %}
@@ -117,7 +117,7 @@
         </div>
       </nav>
       
-      <div class="content">
+      <div class="content"  >
         <div class="container-fluid">
             <div class="container">
               <div class="card">
@@ -240,22 +240,6 @@
           </div>
         </div>
       </div>
-      <footer class="footer footer-default">
-        <div class="container">
-          <div class="float-left">
-            
-          </div>
-          <div class="copyright float-right">
-            &copy;
-            <script>
-              document.write(new Date().getFullYear())
-            </script>, made with <i class="material-icons">favorite</i> by
-            <a href="https://github.com/shubhanginigam18/" target="blank">Shuhangi</a> &
-            <a href="https://github.com/anaghrao-99/" target="blank">Anagh</a>
-            for a better web.
-          </div>
-        </div>
-      </footer>
     </div>
   </div>
   

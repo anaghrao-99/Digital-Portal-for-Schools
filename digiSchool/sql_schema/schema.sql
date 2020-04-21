@@ -139,9 +139,11 @@ marks float not null,
 primary key(studentUsername, exam, subject),
 foreign key(studentUsername) references student(studentUsername));
 
-select distinct(marks) from results;
+delete from results where studentUsername="shubham146" and exam="test5" and subject="hindi";
+
+select * from results;
 drop table results;
 select * from notes;
 select * from student;
 use digischool;
-select * from results;
+select * from login;
