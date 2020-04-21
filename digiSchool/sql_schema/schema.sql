@@ -89,13 +89,13 @@ foreign key(classcode) references class(classcode));
 create table schoolNews(
 id int auto_increment not null,
 schoolUsername varchar(45) not null,
-newsArticle varchar(100) not null,
+newsArticle varchar(512) not null,
 image varchar(100) ,
 primary key(id),
 foreign key(schoolUsername) references school(schoolUsername));
 
 
-delete from schoolNews where id=4;
+drop table schoolNews;
 
 create table schoolComments(
 id int auto_increment,
@@ -135,10 +135,13 @@ create table results(
 studentUsername varchar(45) not null,
 exam varchar(45) not null,
 subject varchar(45) not null,
-marks varchar(45) not null,
+marks float not null,
 primary key(studentUsername, exam, subject),
 foreign key(studentUsername) references student(studentUsername));
-	
+
+select distinct(marks) from results;
+drop table results;
 select * from notes;
 select * from student;
-
+use digischool;
+select * from results;

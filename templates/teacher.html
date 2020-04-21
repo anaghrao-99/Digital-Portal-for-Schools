@@ -269,6 +269,53 @@
             </div>
           </div>
         </div>
+        <div class="modal fade" id="markModal" tabindex="-1" role="">
+          <div class="modal-dialog modal-login" role="document">
+              <div class="modal-content">
+                  <div class="card card-signup card-plain">
+                      <div class="modal-header">
+                          <div class="card-header card-header-primary " style="width: 250px;">
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="material-icons">clear</i></button>
+                              <h3 class="card-title">Review Results</h3>
+                              
+                          </div>
+                      </div>
+              <div class="modal-body" >
+                  <form class="form" id="markForm" method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="subject" value="" id="markSubject"/>
+                    
+                    <table class="table" id="markTable">
+                      <thead>
+                        <th >
+                        #
+                        </th>
+                        <th >
+                          Name
+                        </th>
+                        <th >
+                          Subject
+                        </th>
+                        <th>
+                          Marks
+                        </th>
+                      </thead>
+                      <tbody id="markDisplay">
+                        
+                      </tbody>
+                    </table>
+                    <div class="form-group">
+                      <label for="exam">Exam Name</label>
+                      <input type="text" class="form-control" id="exam" name="exam">
+                    </div>
+                    <input type="text" class="form-control" id="num" name="number" hidden>
+                    <button class="btn btn-primary btn-round" onclick="submitMark()">Submit</button>
+                  </form>
+              </div>
+              </div>
+              </div>
+            </div>
+          </div>
       <div class="content">
         <div class="container-fluid">
           <div class="card">
@@ -343,7 +390,7 @@
                           Notes
                         </th>
                         <th>
-                          Marks
+                          Total Marks
                         </th>
                       </thead>
                       <tbody id="students">
@@ -377,7 +424,7 @@
                               <!-- <div class="form-group"> -->
                               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                               <label class="form-check-label">Max Marks</label>
-                              <input type="text" class="form-control" name="max" id = "maxMarks" required>
+                              <input type="text" class="form-control" name="max" id = "maxMarks" value=1>
                               <!-- </div> -->
 
                               
@@ -395,7 +442,7 @@
                     <br/>
                     <div>
                       <button id="correct_button" class="btn btn-round btn-primary" onclick="correct()">Correct</button>
-                    
+                      <button id="submit_button" class="btn btn-round btn-primary" onclick="submit()">Submit</button>
                     </div>
                 </div>
                 <div id="layer2">
@@ -441,6 +488,61 @@
   <script src="static/js/notify.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <script>
+    function submitMark(){
+      event.preventDefault();
+      var formData = new FormData(document.getElementById('markForm'))
+      if( formData.get('exam') == ""){
+        $("#exam").notify("Please fill this field")
+      }
+      else{
+      $.ajax({
+          url: '/sendResult',
+          type: "POST",
+          data: formData,
+          dataType: 'json',
+          processData: false,
+          contentType: false,
+          
+          success: function ( data ){
+            if(data['msg'] == "done"){
+            $.notify("Submitted", "success");
+            $("#exam").val("");
+            $('#markModal').modal('toggle'); 
+            }
+            else{
+              $.notify("Try again", "error");
+              }
+            
+          },
+          error: function(data) {
+            $.notify("Error", {align:"center", verticalAlign:"top"});
+          },
+      }).done(function(data) {
+      });}
+    };
+    function submit(){
+
+      content = ""
+      var i = 0
+      $("#markDisplay tr").remove();
+      $("#students tr").each(function(){
+        var id = "#" + (this).id + " td:nth-child(1) b";
+        var name = $(id).html();
+        var id = "#" + (this).id + " td:nth-child(2)";
+        var subject = $(id).html();
+        var id = "#" + (this).id + " td:nth-child(6)";
+        var marks = $(id).html();
+        var id = $(id).attr("id");
+        console.log(name,subject,marks,id)
+        content += '<tr><td>'+(i+1)+'</td><td><div class="form-group"><input type="text" class="form-control" id="'+i+'studentName" value="'+name+'" name="'+i+'studentName" disabled></div><input type="text" class="form-control" id="'+i+'studentUsername" value="'+id+'" name="'+i+'studentUsername" hidden></td><td><div class="form-group"><input type="text" class="form-control" id="'+i+'subject" value="'+subject+'" name="'+i+'subject" disabled></div></td><td><div class="form-group"><input type="text" class="form-control" id="'+i+'marks" value="'+marks+'" name="'+i+'marks"></div></td></tr>'
+        i +=1;
+        $("#markSubject").val(subject);
+      });
+      
+      $("#num").val(i);
+      $("#markDisplay").append(content);
+      $("#markModal").modal();
+      };
     $("#photo").change(function(){
       formName = "#photoForm" 
       var form = $(formName)[0];
@@ -488,6 +590,7 @@
             if(data['msg'] == "done"){
             $.notify("Submitted", "success");
             $("#note").val("");
+            $('#noteModal').modal('toggle');
             }
             else{
               $.notify("Try again", "error");
@@ -584,7 +687,7 @@
             }
             for(i=0;i<students.length;i++){
               // console.log(students[i])
-              content = '<tr ><th><b>'+ students[i][6]+'</b></th><th>'+id+'</th>'
+              content = '<tr id="'+i+'idInfo"><td><b>'+ students[i][6]+'</b></td><td>'+id+'</td>'
               
               content += '<td><form class="form" id="'+i+'iduploadForm" method = "post" enctype="multipart/form-data">'
               content += '<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/><input type="hidden" name="name" value='+students[i][0]+'><input type="hidden" name="classCode" value='+ students[i][1] +'><input type="hidden" name="subject" value="'+id+'">';
@@ -592,7 +695,7 @@
               content += '</form></td>'
               // content += '<input type="file" name="file" required /><button onClick="uploadData(this.id)" class="btn btn-round btn-primary submit_document" id="'+i+'id" >Upload</button>'
               content += '<td ><button class="btn btn-link btn-success" id="'+i+'idButton"></button></td><td><button id="'+students[i][6]+'/'+students[i][0]+'" class="btn btn-round btn-primary submit_note" onclick="notes(this.id)"> Submit Note </button> </td>'
-              content += '<td id=' + students[i][0] + '></td>'
+              content += '<td id=' + students[i][0] + '>0.0</td>'
              
               $("#students").append(content)
               $("#after").show();
@@ -808,19 +911,21 @@
                 for(i=0;i<keys.length;i++){
                   if(keys[i] != 'msg'){
                     var id = '#' + keys[i]
-                    $(id).append(data[keys[i]]);
+                    var initial = $(id).html();
+                    console.log(initial)
+                    var val = parseFloat(initial) + parseFloat(data[keys[i]])
+                    $(id).html(val);
                     console.log(data[keys[i]])
                   }
                 }
-
-
               }
-              
-
             },
+            error:function(data){
+              $("#layer2").hide();
+              $.notify("file format not supported","danger")
+            }
       }).done(function(data) {
          $("#layer2").hide();
-
         });
     };
 
@@ -835,6 +940,7 @@
           $(".afterClass").hide();
           $("#answerkey").hide();
           $("#layer2").hide();
+          $.notify('{{msg}}')
         });
 
 

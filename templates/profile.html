@@ -20,7 +20,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <link href="static/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
 
-
+  <link rel="stylesheet" href="static/css/Chart.css" />
+  
   
 </head>
 
@@ -133,13 +134,13 @@
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="#home" data-toggle="tab">
-                            <i class="material-icons">code</i> Homework
+                            <i class="material-icons">code</i> Results
                             <div class="ripple-container"></div>
                           </a>
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" href="#result" data-toggle="tab">
-                            <i class="material-icons">cloud</i> Result
+                            <i class="material-icons">cloud</i> Progress Report
                             <div class="ripple-container"></div>
                           </a>
                         </li>
@@ -188,6 +189,45 @@
                       </table>
                     </div>
                     <div class="tab-pane" id="home">
+                      <div id="numResults" hidden>{{ results[0] }}</div>
+                      <table class="table">
+                        <thead>
+                          <th>
+                            Exam
+                          </th>
+                          <th>
+                            Subject
+                          </th>
+                          <th>
+                            Marks
+                          </th>
+                        </thead>
+                        <tbody>
+                          {% for i in range(1,results[0]) %}
+                              {% for j in range(2,results[i][1]) %}
+                              <tr class="{{i}}group" id="{{i}}id{{j}}">
+                                {% if j == 2 %}
+                                  <th id = "{{i}}exam">
+                                    {{ results[i][0] }}
+                                  </th>
+                                {% else %}
+                                  <th>
+                                    {{ results[i][0] }}
+                                  </th>
+                                {% endif %}
+                                <td >
+                                  <p id="{{i}}id{{j}}subject">{{ results[i][j][0] }}</p>
+                                </td>
+                                <td >
+                                  <p id = "{{i}}id{{j}}marks">{{ results[i][j][1] }}</p>
+                                  <p id="{{i}}id{{j}}max" hidden>{{ results[i][j][2] }}</p>
+                                  <p id="{{i}}id{{j}}avg" hidden>{{ results[i][j][3] }}</p>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                          {% endfor %}
+                        </tbody>
+                      </table>
                       
                     </div>
                     <div class="tab-pane" id="result">
@@ -228,6 +268,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="static/js/plugins/nouislider.min.js" type="text/javascript"></script>
   <script src="static/js/notify.js"></script>
+  <script src="static/js/Chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
   <script>
     $("#photo").change(function(){
@@ -268,6 +309,76 @@
     $(document).ready(function() {
       var message = '{{msg}}'
       $.notify(message,"info")
+      var colors = ['#FFC300','#FF5733','#C70039 '];
+      var numResults = parseInt('{{results[0]}}')
+      var i = 1;
+      for(i=1;i<numResults;i++)
+      {
+        var datasets = []
+        var subjects = []
+        var max = []
+        var avg =[]
+        var mark = []
+        var id ="#"+ i + "exam"
+        exam = $(id).html()
+        var id ="."+ i + "group"
+        $(id).each(function(){
+          var j = (this).id;
+          var id1 = "#" + j + "subject"
+          subjects.push($(id1).html())
+          var id1 = "#" + j + "marks"
+          mark.push($(id1).html())
+          var id1 = "#" + j + "max"
+          max.push($(id1).html())
+          var id1 = "#" + j + "avg"
+          avg.push($(id1).html())
+        });
+        $("#result").append('<div class="card"><div class="row"><div class="col-3"><h4 style="margin-left:30%;margin-top:30%"><b>'+exam+'</b></h4></div><div class="col-9"><canvas id="'+i+'chBar"></canvas></div></div></div>');
+        
+        console.log(subjects,mark,max,avg)
+        var id = i + "chBar"
+        var chBar = document.getElementById(id);
+        console.log(chBar)
+        if (chBar) {
+          new Chart(chBar, {
+          type: 'bar',
+          data: {
+          labels : subjects,          
+          datasets:[{
+            label:"Marks",
+          data : mark,
+          backgroundColor: colors[0]
+        },{
+          label:"Maximum",
+          data : max,
+          backgroundColor: colors[1]
+        },{
+          label:"Average",
+          data : avg,
+          backgroundColor: colors[2]
+        }
+        ]
+        },
+          options: {
+            legend: {
+              display: true
+            },
+            scales: {
+              xAxes: [{
+                barPercentage: 0.4,
+                categoryPercentage: 0.5
+              }],
+              yAxes: [{
+              ticks: {
+              beginAtZero: true
+              }
+              }]
+            }
+          }
+          });
+        }
+      }
+      
     });
 
     var csrf_token = "{{ csrf_token() }}";

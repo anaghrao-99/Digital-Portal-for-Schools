@@ -1,5 +1,3 @@
-[mahimarao_sci101_Science.txt,samanvya1_sci101_Science.txt,shubhangi18_sci101_Science.txt]
-[[1.0000002  0.92145926 0.92145926 0.92145926]
- [0.92145926 1.         1.         1.        ]
- [0.92145926 1.         1.         1.        ]
- [0.92145926 1.         1.         1.        ]]
+[shubham146_school011A_hindi.txt]
+[[1.0000005  0.6275939 ]
+ [0.6275939  0.99999976]]

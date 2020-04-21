@@ -30,6 +30,24 @@ cursor = mycon.cursor()
 
 app.config['SECRET_KEY'] = 'digitalPortalForSchools'
 
+def maxMarks(exam,subject):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql = "select max(marks) from results where exam=%s and subject=%s"
+    val = (exam,subject)
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    return table[0][0]
+
+def avgMarks(exam,subject):
+    mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+    cursor = mycon.cursor()
+    sql = "select avg(marks) from results where exam=%s and subject=%s"
+    val = (exam,subject)
+    cursor.execute(sql,val)
+    table = cursor.fetchall()
+    return table[0][0]
+
 def studentdata(username):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
     cursor = mycon.cursor()
@@ -51,11 +69,30 @@ def studentdata(username):
     notes.append(0)
     for note in table:
         note1 = list(note)
-        note1[1] = getName(note1[1])
+        note1[2] = getName(note1[2])
         notes.append(note1)
     notes[0] = len(notes) 
+    sql = "select distinct(exam) from results where studentUsername=%s"
+    val = (username,)
+    cursor.execute(sql, val)
+    table = cursor.fetchall()
+    results = [0]
+    for row in table:
+        result = [row[0],0]
+        print(row[0])
+        sql = "select subject,marks from results where exam=%s and studentUsername=%s"
+        val = (row[0],username)
+        cursor.execute(sql, val)
+        exams = cursor.fetchall()
+        for exam in exams:
+            maxMark = maxMarks(row[0],exam[0])
+            avgMark = avgMarks(row[0],exam[0])
+            result.append([exam[0],exam[1],maxMark,avgMark])
+        result[1] = len(result)
+        results.append(result)
+    results[0] = len(results)
     mycon.close()
-    return [studentinfo,verified,notes]
+    return [studentinfo,verified,notes,results]
 
 def updateNotes(id):
     mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
@@ -312,6 +349,7 @@ def getCategory(username):
     table = cursor.fetchall()
     # print(table)
     return table[0][2]
+
 
 
 def isAssociated(school):
@@ -625,8 +663,10 @@ def profile():
                     return render_template("pendingStudent.html",msg=session['msg'],user=username,name=name)
                 else:
                     notes = data[2]
+                    results = data[3]
+                    print(results)
                     mycon.close()
-                    return render_template("profile.html",profile=profile,notes=notes,msg=session['msg'],user=username, name=name,studentInfo=studentinfo,schools=schoolsData,category="student")
+                    return render_template("profile.html",results=results,profile=profile,notes=notes,msg=session['msg'],user=username, name=name,studentInfo=studentinfo,schools=schoolsData,category="student")
         elif(category == "parent"):
             schoolsData = schools()
             children = studentList(username)
@@ -674,7 +714,7 @@ def profile():
         schoolsData = schools()
         return render_template("template.html",msg=session['msg'],schools = schoolsData,category="")
     finally:
-        mycon.close()
+        msg = "done"
 
 
 @app.route('/submitNote' , methods=['POST','GET'])
@@ -875,8 +915,9 @@ def correct():
         data = {}
         print("In /correct")
         teacher = session['username']
-
-        path = 'automated_correction_module/' + teacher + '/input/'
+        path = os.path.join('automated_correction_module',str(teacher),'input')
+        # path = 'automated_correction_module/' + teacher + '/input/'
+        
         files = os.listdir(path)
         print(files)
         recognition_files = []
@@ -885,12 +926,14 @@ def correct():
             if('.png' in file or '.jpg' in file):
 
                 initial_directory = os.path.abspath(os.getcwd())
-                # pipe = subprocess.check_call(["python", "word_seg_try.py", initial_directory + '/' + path + file], cwd='/automated_correction_module/')
+                pipe1 = subprocess.check_call(["python", "word_seg_try.py" , os.path.join(initial_directory,path,file)], cwd= os.path.join(initial_directory,'automated_correction_module'))
                 
-                pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
+                # pipe1 = subprocess.check_call(["python", "word_seg_try.py" , initial_directory + '/' + path + file], cwd= initial_directory + '/automated_correction_module/')
                 time.sleep(5)
+                pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd= os.path.join(initial_directory,'automated_correction_module','classification'))
                 
-                pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+                # pipe = subprocess.check_call(["python", "Prediction.py", file] , cwd = initial_directory + '/automated_correction_module/classification/')
+                
                 time.sleep(5)
                 print("/Correct prediction over")
 
@@ -901,8 +944,8 @@ def correct():
                 string += recognition_files[i] + "]"
             else:
                 string += recognition_files[i] + ","
-
-        path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
+        path = os.path.join(os.path.abspath(os.getcwd()),'automated_correction_module', teacher )
+        # path = os.path.abspath(os.getcwd()) + '/automated_correction_module/' + teacher + '/'
         files = os.listdir(path)
         for i in range(len(files)):
             if '.txt' in files[i]:
@@ -911,8 +954,8 @@ def correct():
         # pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file], cwd= initial_directory + '/automated_correction_module/')
         # time.sleep(5)
         with open('marks.txt', "w") as f:
-            pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file],stdout= f, cwd= initial_directory + '/automated_correction_module/')
-
+            # pipe1 = subprocess.check_call(["python", "semantic.py" , string, path + answer_file],stdout= f, cwd= initial_directory + '/automated_correction_module/')
+            pipe1 = subprocess.check_call(["python", "semantic.py" , string, os.path.join(path,answer_file)],stdout= f, cwd= os.path.join(initial_directory , 'automated_correction_module'))
 
         file = open('marks.txt', "r")
         counter = 0
@@ -924,19 +967,52 @@ def correct():
 
             if(counter == 1):
                 marks = line[2:len(line)-2].split()
-
-
             counter += 1
 
         maxMarks= request.get_data()
         print(maxMarks)
 
         for i in range(len(files)):
-            data[files[i].split('_')[0]] = round(float(marks[i+1])*int(maxMarks))
+            data[files[i].split('_')[0]] = float(marks[i+1])*int(maxMarks)
 
         data['msg']= 'done'
         # time.sleep(5)
         return data
+    
+
+@app.route('/sendResult' , methods=['POST','GET'])
+def sendResult():
+    data = {}
+    if request.method == 'POST':
+        # try:
+            exam = request.form['exam']
+            num = request.form['number']
+            print(json.dumps(request.form.to_dict()))
+            mycon = mysql.connector.connect( host="localhost", user="root", passwd="123456789", db="digischool" )
+            cursor = mycon.cursor()
+            for i in range(int(num)):
+                j = str(i) +"studentUsername"
+                print(j)
+                user = request.form[j]
+                print("hi")
+                j = "subject"
+                subject = request.form[j]
+                print("hi")
+                j = str(i) + "marks"
+                marks = request.form[j]
+                print("hi")
+                sql = "insert into results(studentUsername,exam,subject,marks) values (%s, %s, %s,%s)"
+                val=(user,exam,subject,marks)
+                cursor.execute(sql,val)
+            print("hi")
+            mycon.commit()
+            data['msg'] = "done"
+        # except Exception as e:
+        #     print("hi",e)
+        #     data['msg'] = e
+        # finally:
+            return data
+    
     
 
 @app.route('/getStructure',methods=['POST','GET'])
@@ -1029,11 +1105,13 @@ def childProfile():
             print("hi")
             return render_template("pending.html",child=child,msg=session['msg'],user=username,name=name,studentInfo=studentinfo,schools=schoolsData,category="parent",children=usernameList,count=count)
         else:
+            session['msg'] = "Welcome"
             notes = data[2]
+            results = data[3]
             profile = 1
             if os.path.exists("static/img/faces/"+susername+".png"):
                 profile = 0
-            return render_template("childProfile.html",suser=susername,profile=profile,child=child,notes=notes,studentInfo=studentinfo,msg=session['msg'],user=username, name=name,schools=schoolsData,category="parent",children=usernameList,count=count)
+            return render_template("childProfile.html",results=results,suser=susername,profile=profile,child=child,notes=notes,studentInfo=studentinfo,msg=session['msg'],user=username, name=name,schools=schoolsData,category="parent",children=usernameList,count=count)
     except Exception as e:
         print(e)
         return redirect('/profile')
